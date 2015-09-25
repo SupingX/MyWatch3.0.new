@@ -1,0 +1,12 @@
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_address"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:paddingTop="3dp"
+    android:layout_gravity="center_vertical"
+    android:paddingBottom="3dp"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:text="33"
+    android:textColor="@color/grey"
+    android:textSize="14sp" />

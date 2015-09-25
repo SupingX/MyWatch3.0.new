@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="clock">闹钟</string>
+    <string name="save">保存</string>
+    <string name="data_manager">数据管理</string>
+    <string name="more">更多</string>
+    <string name="sync_all_data">同步所有数据</string>
+    <string name="clear_all_data">清除数据</string>
+    <string name="device">手环</string>
+    <string name="connection">连接</string>
+    <string name="available_device_nearby">附近可用手环</string>
+    <string name="search">搜索</string>
+    <string name="disconnected">断开连接</string>
+    <string name="connected_watch">绑定手环</string>
+    <string name="search_device">查找手环</string>
+    <string name="bind_other_device">绑定其他手环</string>
+    <string name="disconnect_reminded">断连提醒</string>
+    <string name="heart_rate">心率</string>
+    <string name="history">历史记录</string>
+    <string name="setting">设置</string>
+    <string name="pedometer">计步</string>
+    <string name="sleep">睡眠</string>
+    <string name="steps">步</string>
+    <string name="hours">小时</string>
+    <string name="bmp">次/分</string>
+    <string name="rssi">信号强度</string>
+    <string name="off">关</string>
+        <string name="on">开</string>
+    <string name="weather">天气</string>
+    <string name="camera">相机</string>
+    <string name="call_reminder">来电提示</string>
+    <string name="music">音乐</string>
+    <string name="watch_time_sync">时间同步</string>
+    <string name="shutdown_watch">关闭手环</string>
+    <string name="about">关于</string>
+    <string name="age">年龄</string>
+    <string name="_0_200">设置范围 0~200</string>
+    <string name="height">身高</string>
+    <string name="_0_300">设置范围 0~300</string>
+    <string name="target">目标</string>
+    <string name="_500_100000">设置范围 500~100000</string>
+        <string name="weight">体重</string>
+    
+       <string name="end_time">结束时间</string>
+           <string name="start_time">开始时间</string>
+       
+       <string name="city">城市</string>
+    <string name="_write_city_name">输入城市名称</string>
+    <string name="available_city_0">可用城市 : </string>
+       
+       
+           <string name="temperature">温度</string>
+        <string name="select_type">选择类型</string>
+       
+       
+          <string name="_setting_city">设置城市</string>
+        <string name="update_date">更新日期</string>
+       
+       
+         <string name="_max_hr">最大心率</string>
+        <string name="_min_hr">最小心率</string>
+        <string name="_240">最大值240</string>
+        <string name="_40">最小值40</string>
+       
+      <string name="current_hr"> 当前心率</string>
+        <string name="avg_hr">平均心率</string>
+        
+               <string name="step_total">总计步数</string>
+        <string name="total_distance">总里程</string>
+        <string name="total_calorie">总消耗卡路里</string>
+        
+        
+               <string name="complete">完成率</string>
+        <string name="calorie">卡路里</string>
+        <string name="distance">里程</string>
+        <string name="time">时间</string>
+        
+            <string name="gender">性别</string>
+            
+                 <string name="sleep_total">总计睡眠时间</string>
+    
+        
+        
+             <string name="awake_time">清醒时间</string>
+        <string name="deep_sleep">深睡时间</string>
+        <string name="light_sleep">浅睡时间</string>
+        
+        
+          <string name="cancel">取消</string>
+        
+           <string name="preious">"&lt;&lt; "</string>
+    <string name="next">" >>"</string>
+            <string name="confirm">确认</string>
+        
+        
+        
+              <string name="min">分</string>
+                <string name="device_is_not_connected">手环没有连接</string>
+                
+                        <string name="is_deleteing">正在删除中</string>
+            
+             <string name="is_setting">正在设置中</string>
+        <string name="no_binding">无绑定</string>
+        <string name="is_connected">已连接</string>
+        <string name="is_connecting">匹配中</string>
+        <string name="binded">已绑定</string>
+        <string name="connect_closing">连接关闭中</string>
+        <string name="enable_blue">打开蓝牙？</string>
+        <string name="open">打开</string>
+                        
+                  <!-- 天气 -->
+          <string name="weather_20">龙卷风</string>
+    <string name="weather_16">热带风暴</string>
+    <string name="weather_19">飓风</string>
+    <string name="weather_22">严重雷暴</string>
+    <string name="weather_21">雷暴</string>
+    <string name="weather_11">雨夹雪</string>
+    <string name="weather_14">雨夹雹</string>
+    <string name="weather_04">小雨</string>
+    <string name="weather_06">冻雨</string>
+    <string name="weather_07">阵雨</string>
+    <string name="weather_08">小雪</string>
+    <string name="weather_61">小阵雪</string>
+    <string name="weather_10">高吹雪</string>
+    <string name="weather_09">雪</string>
+    <string name="weather_13">冰雹</string>
+    <string name="weather_15">灰尘</string>
+    <string name="weather_12">雾</string>
+    <string name="weather_62">薄雾</string>
+    <string name="weather_63">烟雾</string>
+    <string name="weather_64">狂风</string>
+    <string name="weather_65">风</string>
+    <string name="weather_66">冷</string>
+    <string name="weather_02">多云</string>
+    <string name="weather_01">晴</string>
+    <string name="weather_03">局部多云</string>
+    <string name="weather_73">热</string>
+    <string name="weather_74">雷阵雨</string>
+    <string name="weather_75">大雪</string>
+    <string name="weather_76">阵雪</string>
+    <string name="weather_77">阵雨夹雪</string>
+    <string name="weather_00">未知</string>       
+           <string name="sleep_avg">平均睡眠时间</string>     
+                        
+        
+    
+    <string name="device_none" >绑定手环</string>
+<!--     <string name="other_watch">Disconnected</string> -->
+    <string name="contact_binding">解除绑定?</string>
+    <string name="no_device_binding">没有绑定手环</string>
+    
+     <string name="completion_rate">完成率：</string>
+        <string name="kcal">千卡</string>
+    <string name="km">公里</string>
+     <string name="today">今天,</string>
+
+     
+       <string name="sync_all_ing">正在同步</string>
+     
+       
+        <string name="_cm">厘米</string>
+    <string name="kg">公斤</string>
+    <string name="female">女</string>
+    <string name="male">男</string>
+    
+    
+    
+    <string name="in_searching">准备查找中</string>
+    <string name="in_weathering">正在加载天气</string>
+    <string name="in_citying">搜索城市中</string>
+    
+      <string name="loading">正在加载</string>
+    <string name="choose_sex">选择性别</string>
+    
+    
+        <string name="setting_wrong">设置错误</string>
+    <string name="in_conntecting">正在连接</string>
+    <string name="close_">关闭手环？</string>
+    <string name="Exit">关闭</string>
+    <string name="app_version_info">app版本 ：</string>
+    <string name="positive">确定</string>
+        <string name="find_phone">查找手机</string>
+        
+        <string name="stop_searching">停止搜索中...</string>
+        
+     
+</resources>

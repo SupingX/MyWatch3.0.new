@@ -1,0 +1,297 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/rl_home"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/color_top_blue" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/weather"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:id="@+id/fl_home"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/selector_home_bg"
+            android:clickable="true" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:clickable="false"
+                android:src="@drawable/ic_home_page_icon" />
+        </FrameLayout>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <LinearLayout 
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+     
+            >
+               <TextView
+                          android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+                   android:paddingBottom="3dp"
+                   android:paddingTop="3dp"
+            android:id="@+id/tv_target"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="30dp"
+            android:text="@string/city"
+            android:textColor="@color/grey"
+            android:textSize="14sp" />
+            
+               <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1px"
+        android:background="@color/alertdialog_line" />
+            <RelativeLayout
+        android:id="@+id/rl_weather_setting"
+        style="@style/DeviceItem"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:clickable="true"
+   android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" >
+
+        <ImageView
+                 android:visibility="gone"
+            android:id="@+id/img_target"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="12dp"
+            android:gravity="center"
+            android:src="@drawable/ic_more_shutdown" />
+
+        <TextView
+            android:id="@+id/tv_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/img_target"
+            android:gravity="center_vertical"
+            android:text="@string/_setting_city"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/img_target_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:gravity="center"
+            android:src="@drawable/ic_action_next_item" />
+                 <TextView
+            android:id="@+id/tv_city"
+            android:text="北京"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@id/img_target_next"
+            android:gravity="center_vertical"
+            android:textColor="@color/grey"
+            android:textSize="16sp" />
+    </RelativeLayout>
+            
+                         <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1px"
+        android:background="@color/alertdialog_line" />
+            
+                         
+             <TextView
+                          android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+                   android:paddingBottom="3dp"
+                   android:paddingTop="3dp"
+            android:id="@+id/tv_weather"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="30dp"
+            android:text="@string/weather"
+            android:textColor="@color/grey"
+            android:textSize="14sp" />
+            
+               <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1px"
+        android:background="@color/alertdialog_line" />
+            <RelativeLayout
+        android:id="@+id/rl_weather_value"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+   android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" >
+
+      
+
+        <TextView
+            android:id="@+id/tv_weather_value"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="--"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+     
+    </RelativeLayout>
+            
+                         <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1px"
+        android:background="@color/alertdialog_line" />
+                         
+                          <TextView
+                          android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+                   android:paddingBottom="3dp"
+                   android:paddingTop="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="30dp"
+            android:text="@string/temperature"
+            android:textColor="@color/grey"
+            android:textSize="14sp" />
+            
+               <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1px"
+        android:background="@color/alertdialog_line" />
+            <RelativeLayout
+        android:id="@+id/rl_weather_temp"
+        style="@style/DeviceItem"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:clickable="true"
+   android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" >
+
+        <ImageView
+                 android:visibility="gone"
+            android:id="@+id/img_target_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="12dp"
+            android:gravity="center"
+            android:src="@drawable/ic_more_shutdown" />
+
+        <TextView
+            android:id="@+id/tv_temp_value"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/img_target_temp"
+            android:gravity="center_vertical"
+                    android:text="--"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/img_temp_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:gravity="center"
+            android:src="@drawable/ic_action_next_item" />
+           <TextView
+            android:id="@+id/tv_temp_unit"
+            android:text="℃"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@id/img_temp_next"
+            android:gravity="center_vertical"
+            android:textColor="@color/grey"
+            android:textSize="16sp" />
+    </RelativeLayout>
+            
+                         <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1px"
+        android:background="@color/alertdialog_line" />
+                         
+           <TextView
+                        android:visibility="invisible"
+                          android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+                   android:paddingBottom="3dp"
+                   android:paddingTop="3dp"
+            android:id="@+id/tv_update"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginTop="30dp"
+            android:text="@string/update_date"
+            android:textColor="@color/grey"
+            android:textSize="14sp" />
+            
+               <View
+                            android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="0.1px"
+        android:background="@color/alertdialog_line" />
+            <RelativeLayout
+                android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+   android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" >
+
+      
+
+        <TextView
+            android:id="@+id/tv_update_date"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="--"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+     
+    </RelativeLayout>
+                         <View
+                                      android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="0.1px"
+        android:background="@color/alertdialog_line" />           
+                         
+                         
+        </LinearLayout>
+        </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.mycj.mywatch"
+    android:versionCode="1"
+    android:versionName="1.0.1509251414" >
+
+    <uses-sdk
+        android:minSdkVersion="18"
+        android:targetSdkVersion="22" />
+    
+       
+    <!-- 时候前台显示 -->
+	<uses-permission android:name="android.permission.GET_TASKS"/>
+    <!-- 自定义dialog -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- 相机 -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <!-- blue -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <!-- <uses-permission android:name="android.permission.WRITE_CALL_LOG" /> -->
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <!-- <uses-permission android:name="android.permission.WRITE_SMS" /> -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!-- 读取手机联系人 -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- 授予程序访问振动器的权限 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 全局弹窗 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" >
+    </uses-permission>
+   
+
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+    <application
+        android:name="org.litepal.LitePalApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <uses-library android:name="android.test.runner" />
+
+        <activity
+            android:name=".activity.PedometerActivity"
+            android:label="@string/title_activity_pedometer"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.HeartRateActivity"
+            android:label="@string/title_activity_heart_rate"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.ClockActivity"
+            android:label="@string/title_activity_clock"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.CameraActivity"
+            android:label="@string/title_activity_camera"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.SleepActivity"
+            android:label="@string/title_activity_sleep"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.DeviceActivity"
+            android:label="@string/title_activity_device"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.WeatherActivity"
+            android:label="@string/title_activity_weather"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.MoreActivity"
+            android:label="@string/title_activity_more"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <service
+            android:name=".service.MusicService"
+            android:enabled="true" >
+        </service>
+        <service
+            android:name=".service.SimpleBlueService"
+            android:enabled="true" >
+        </service>
+
+        <activity
+            android:name=".TestActivity"
+            android:label="@string/title_activity_test"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.DeviceSearchDeviceActivity"
+            android:label="@string/title_activity_device_search_device"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.DeviceBindOtherActivity"
+            android:label="@string/title_activity_device_bind_other"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.MusicActivity"
+            android:label="@string/title_activity_music"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.DataManagerActivity"
+            android:label="@string/title_activity_data_manager"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".SpalishActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.PedometerSettingTargetActivity"
+            android:label="@string/title_activity_pedometer_setting_target"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.PedometerSettingHeightActivity"
+            android:label="@string/title_activity_pedometer_height"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.PedometerSettingWeightActivity"
+            android:label="@string/title_activity_pedometer_weight"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".PedometerSettingGenderActivity"
+            android:label="@string/title_activity_pedometer_setting_gender"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.PedometerSettingAgeActivity"
+            android:label="@string/title_activity_pedometer_setting_age"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.mycj.mywatch.activity.SleepSettingStartTimeActivity"
+            android:label="@string/title_activity_sleep_setting_start_time"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.mycj.mywatch.activity.SleepSettingEndTimeActivity"
+            android:label="@string/title_activity_sleep_setting_end_time"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".DialogActivity"
+            android:label="@string/title_activity_dialog"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog" >
+        </activity>
+        <activity
+            android:name="com.mycj.mywatch.activity.WeatherCitySetActivity"
+            android:label="@string/title_activity_weather_city_set"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.mycj.mywatch.activity.WeatherTempUnitSetActivity"
+            android:label="@string/title_activity_weather_temp_unit_set"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <!-- Receiver -->
+   <!--     <receiver android:name=".BluetoothStateBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
+                <action android:name="android.bluetooth.adapter.action.ACTION_CONNECTION_STATE_CHANGED" />
+                <action android:name="android.bluetooth.adapter.action.ACTION_ACL_DISCONNECTED" />
+                <action android:name="android.bluetooth.adapter.action.ACTION_ACL_CONNECTED" />
+            </intent-filter>
+        </receiver>  -->
+        
+    </application>
+
+</manifest>

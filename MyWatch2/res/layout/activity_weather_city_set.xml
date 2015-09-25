@@ -1,0 +1,135 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#fff"
+    tools:context="${relativePackage}.${activityClass}" >
+    <RelativeLayout
+        android:layout_alignParentTop="true"
+        android:id="@+id/rl_home"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/color_top_blue" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/city"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+       
+                <RelativeLayout
+        android:id="@+id/rl_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/selector_home_bg"
+            android:clickable="true" >
+
+            <ImageView
+                android:id="@+id/img_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:clickable="false"
+                android:src="@drawable/ic_action_previous_item" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/img_back"
+                android:text="@string/weather"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+        <TextView
+            android:gravity="center"
+            android:background="@drawable/selector_home_bg"
+            android:clickable="true"
+            android:id="@+id/tv_search_city"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="4dp"
+            android:text="@string/search"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+         <com.mycj.mywatch.view.CleanEditText
+             android:background="@drawable/bg_edit_city"
+             android:layout_marginLeft="12dp"
+			android:layout_marginRight="12dp"
+             android:layout_marginTop="10dp"
+             android:paddingLeft="12dp"
+             android:paddingRight="12dp"
+            android:id="@+id/ed_city"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:hint="@string/_write_city_name"
+            android:maxLength="16"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:textSize="14sp"
+        >
+            <requestFocus />
+        </com.mycj.mywatch.view.CleanEditText>
+        <LinearLayout 
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            >
+            <LinearLayout 
+                android:orientation="horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                    android:layout_marginTop="30dp"
+                >
+            <TextView
+                          android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+                   android:paddingBottom="3dp"
+                   android:paddingTop="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/available_city_0"
+            android:textColor="@color/grey"
+            android:textSize="14sp" />
+               <TextView
+                          android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+                   android:paddingBottom="3dp"
+                   android:paddingTop="3dp"
+            android:id="@+id/tv_city_count"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+        
+            android:textColor="@color/grey"
+            android:textSize="14sp" />
+            </LinearLayout>
+                   <View
+        android:layout_width="match_parent"
+        android:layout_height="2px"
+        android:layout_marginStart="12dp"
+        android:background="@color/alertdialog_line" />
+        <ListView 
+            android:layout_below="@id/ed_city"
+            android:id="@+id/lv_city"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            >
+            
+        </ListView>
+</LinearLayout>
+</LinearLayout>
