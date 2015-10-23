@@ -73,7 +73,7 @@
             android:background="@color/color_top_blue" >
 
             <TextView
-                     android:id="@+id/tv_title"
+                android:id="@+id/tv_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -97,7 +97,8 @@
                     android:clickable="false"
                     android:src="@drawable/ic_home_page_icon" />
             </FrameLayout>
-              <FrameLayout
+
+            <FrameLayout
                 android:id="@+id/fl_sync"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
@@ -111,32 +112,44 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:clickable="false"
-                    android:visibility="gone"
-                    android:src="@drawable/ic_sync" />
-                     <ImageView
-                    android:clickable="true"
-                    android:visibility="visible"
-                                   android:id="@+id/img_share"
+                    android:src="@drawable/ic_sync"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/img_share"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/selector_share" />
+                    android:clickable="true"
+                    android:src="@drawable/selector_share"
+                    android:visibility="visible" />
             </FrameLayout>
         </RelativeLayout>
 
-      <!--   <android.support.v4.view.ViewPager
+        <!--
+        <android.support.v4.view.ViewPager
             android:id="@+id/vp_pedo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
     	 >
-        </android.support.v4.view.ViewPager> -->
-        
-        <FrameLayout 
+        </android.support.v4.view.ViewPager>
+        -->
+
+
+        <!--
+             <FrameLayout 
             
             android:id="@+id/frame_sleep"
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             ></FrameLayout>
+        -->
+
+        <com.mycj.mywatch.view.NoScrollViewPager
+            android:id="@+id/vp_sleep"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </com.mycj.mywatch.view.NoScrollViewPager>
     </LinearLayout>
 
 </RelativeLayout>

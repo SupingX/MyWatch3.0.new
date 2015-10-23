@@ -21,6 +21,7 @@ import com.mycj.mywatch.BaseFragment;
 import com.mycj.mywatch.R;
 import com.mycj.mywatch.bean.Constant;
 import com.mycj.mywatch.bean.SleepData;
+import com.mycj.mywatch.business.ParseSleepData;
 import com.mycj.mywatch.util.DataUtil;
 import com.mycj.mywatch.util.DateUtil;
 import com.mycj.mywatch.util.SharedPreferenceUtil;
@@ -48,17 +49,16 @@ public class SleepHistoryFragment extends BaseFragment implements OnClickListene
 	private TextView tvTotal;
 	private int monthMaxDay =30;
 	private ProgressDialog showProgressDialog;
-	private float total;
-	private float awak;
-	private float light;
-	private float deep;
+//	private float total;
+//	private float awak;
+//	private float light;
+//	private float deep;
 	private Date currentDate;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_sleep_history, container,false);
 		initViews(view);
 		setListener();
-		total =0f;
 		loadData();
 		return view;
 	}
@@ -86,25 +86,23 @@ public class SleepHistoryFragment extends BaseFragment implements OnClickListene
 
 		switch (v.getId()) {
 		case R.id.tv_preious:
-			total = 0f;
 		//1.动画变化
 		startAnimation(tvPreious);
 			currentDate = getDateForDiff(-1);
 		tvDate.setText(DateUtil.dateToString(currentDate, SDF));
 		//3。查询数据库，根据日期
-		List<Float> list = getData(currentDate);
-		Log.e("", "----------------------" +list);
-		sleepHistoryView.setData(list);
+		List<Float> countList = getCountData(currentDate);
+		Log.e("", "----------------------" +countList);
+		sleepHistoryView.setData(countList);
 		break;
 	case R.id.tv_next:
-		total = 0f;
 		//1.动画变化
 		startAnimation(tvPreious);
 		//2。日期变化 -1
 		 currentDate = getDateForDiff(1);
 		tvDate.setText(DateUtil.dateToString(currentDate, SDF));
 		//3。查询数据库，根据日期
-		List<Float> listNext = getData(currentDate);
+		List<Float> listNext = getCountData(currentDate);
 		Log.e("", "----------------------" +listNext);
 		sleepHistoryView.setData(listNext);
 		break;
@@ -120,7 +118,7 @@ public class SleepHistoryFragment extends BaseFragment implements OnClickListene
 		mhandler.post(new Runnable() {
 			@Override
 			public void run() {
-				List<Float> listNext = getData(currentDate);
+				List<Float> listNext = getCountData(currentDate);
 				sleepHistoryView.setData(listNext);
 				updateCountSleep();
 			}
@@ -142,14 +140,19 @@ public class SleepHistoryFragment extends BaseFragment implements OnClickListene
 		tvTotal.setText(DataUtil.format(Float.valueOf(total)/monthMaxDay)+"");
 		int start = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_START_HOUR, 0);
 		int end = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_END_HOUR, 23);
-		int size = Math.abs(end - start);
+		int size;
+		if (start>end) {
+			size = (24-start)+end;
+		}else{
+			size = end-start;
+		}
 		tvComplete.setText(DataUtil.format(avg*100/size)+"%");
 	}
 	
 	
 	
-	private List<Float> getData(Date date) {
-		List<Float> data = new ArrayList<Float>();
+	private List<Float> getCountData(Date date) {
+		List<Float> countData = new ArrayList<Float>();
 		//获取本月天数
 		Calendar c = Calendar.getInstance();
     	c.setTime(date);
@@ -160,13 +163,17 @@ public class SleepHistoryFragment extends BaseFragment implements OnClickListene
 		for (int i = 0; i < monthMaxDay; i++) {
 			c.set(Calendar.DAY_OF_MONTH, i+1);
 			SleepData findSleepDateByDate = findSleepDateByDate(c.getTime());
+		
 			//有数据就添加
-			if (findSleepDateByDate!=null&&findSleepDateByDate.getSleeps()!=null) {
-				parseSleeps(findSleepDateByDate.getSleeps());
-				data.add(total);
+			if (findSleepDateByDate!=null&&findSleepDateByDate.getSdatas()!=null) {
+				String sdatas = findSleepDateByDate.getSdatas();
+				String[] split = sdatas.split(",");
+//				parseSleeps(split);
+				float[] datas = ParseSleepData.parseSleepData(split);
+				countData.add(datas[1]+datas[2]);
 			}else{
 				//没有数据就为0
-				data.add(0f);
+				countData.add(0f);
 			}
 		}
 		if (showProgressDialog != null&&showProgressDialog.isShowing()) {
@@ -174,7 +181,7 @@ public class SleepHistoryFragment extends BaseFragment implements OnClickListene
 		}
 		//从数据库中获取一个月所有的天数的数据
 //		List<SleepData> list = findAllSleepDateByMonth(date);
-		return data;
+		return countData;
 	}
 	
 	/**
@@ -182,40 +189,41 @@ public class SleepHistoryFragment extends BaseFragment implements OnClickListene
 	 * @param sleeps
 	 * @return
 	 */
-	private void parseSleeps(int [] sleeps){
-		for (int i = 0; i < sleeps.length; i++) {
-			
-			switch (sleeps[i]) {
-			case 0:
-				break;
-			case 1:
-				total += 0.25f;// 获得总的睡眠时间
-				awak += 0.75f;
-				light += 0.25;
-				break;
-			case 2:
-				awak += 0.25f;
-				light += 0.75f;
-				total += 0.75f;// 获得总的睡眠时间
-				break;
-			case 3:
-				light += 1f;
-				total += 1f;// 获得总的睡眠时间
-				break;
-			case 4:
-				deep += 1f;
-				total += 1f;// 获得总的睡眠时间
-				break;
-			case 5:
-				deep += 1f;
-				total += 1f;// 获得总的睡眠时间
-				break;
-			default:
-				break;
-			}
-			
-		}
-	}
+//	private void parseSleeps(String [] sleeps){
+//		total=0;
+//		awak=0;
+//		deep=0;
+//		light=0;
+//		for (int i = 0; i < sleeps.length; i++) {
+//			switch (Integer.valueOf(sleeps[i])) {
+//			case 0:
+//				awak+=1f;
+//				break;
+//			case 1:
+//				awak += 0.75f;
+//				light += 0.25f;
+//				break;
+//			case 2:
+////				awakTime += 0.25f;
+//				light += 1f;
+//				break;
+//			case 3:
+//				light += 0.75f;
+//				deep+=0.25f;
+//				break;
+//			case 4:
+//				light+=0.25f ;
+//				deep +=0.75f;
+//				break;
+//			case 5:
+//				deep += 1f;
+//				break;
+//			default:
+//				break;
+//			}
+//			total = light+deep;
+//		}
+//	}
 	
 	/**
 	 *	根据日期查找sleepData

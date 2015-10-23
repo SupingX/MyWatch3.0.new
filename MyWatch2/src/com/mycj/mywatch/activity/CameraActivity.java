@@ -183,15 +183,22 @@ mCameraManager.stopPreviewCamera();
 	public void setListener() {
 		imgTakePicture.setOnClickListener(this);
 	}
-
+	private long lastTime = 0;
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.img_take_picture:
 //			mHandler.removeCallbacks(takePictureThread);
 //			new Thread(takePictureThread).start();
+			long currentTimeMillis = System.currentTimeMillis();
+			if (currentTimeMillis-lastTime<1000) {//当xiao于500ms
+				Log.i("", "2次点击小于500ms ， 不能拍照");
+				lastTime = currentTimeMillis;
+				return;
+			}
 			mHandler.post(takePictureThread);
-		
+			lastTime = currentTimeMillis;
+			
 //			mCameraManager.startPreview(cameraSurfaceView.getSurfaceHolder(), previewRate);
 //			mCameraManager.setPreviewing(true);
 			

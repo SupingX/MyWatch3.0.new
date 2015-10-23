@@ -30,13 +30,15 @@ public class SleepCountView extends View {
 	private float spaceY = 50;
 	private float perWidth;
 	private int size;
-	public int getSize(){
+
+	public int getSize() {
 		return this.size;
 	}
-	private float total;
-	private float deep;
-	private float awakTime;
-	private float light;
+
+//	private float total;
+//	private float deep;
+//	private float awakTime;
+//	private float light;
 
 	private Paint textPaint;
 
@@ -62,35 +64,36 @@ public class SleepCountView extends View {
 		init(context);
 	}
 
-	public float getTotal() {
-		return total;
-	}
-
-	public float getDeep() {
-		return deep;
-	}
-
-	public float getLight() {
-		return light;
-	}
-
-	public float getAwak() {
-		return awakTime;
-	}
+//	public float getTotal() {
+//		return total;
+//	}
+//
+//	public float getDeep() {
+//		return deep;
+//	}
+//
+//	public float getLight() {
+//		return light;
+//	}
+//
+//	public float getAwak() {
+//		return awakTime;
+//	}
 
 	public void setSleepData(int[] sleeps) {
+//		this.total = 0;
+//		this.awakTime = 0;
+//		deep = 0;
+//		light = 0;
 		if (sleeps == null) {
 			Log.v("", "sleeps为空");
 			this.sleeps = null;
 			this.sleeps = new int[size];
-			this.total = 0;
-			this.awakTime = 0;
-			this.colorDeep = 0;
-			this.colorLight = 0;
+
 		} else {
 			this.sleeps = sleeps;
-			parseSleepData(this.sleeps);
-			 size = sleeps.length;
+//			parseSleepData(this.sleeps);
+			size = sleeps.length;
 		}
 
 		invalidate();
@@ -154,7 +157,7 @@ public class SleepCountView extends View {
 			perWidth = mWidth / size;
 		}
 
-		drawRect(canvas);
+		drawRects(canvas);
 		super.onDraw(canvas);
 	}
 
@@ -177,11 +180,16 @@ public class SleepCountView extends View {
 
 		start = (int) SharedPreferenceUtil.get(context, Constant.SHARE_SLEEP_START_HOUR, 0);
 		end = (int) SharedPreferenceUtil.get(context, Constant.SHARE_SLEEP_END_HOUR, 23);
-		size = Math.abs(end - start);
-		if (size==0) {
-			size=1;
+//		size = Math.abs(end - start);
+		if (end<start) {
+			size = 24-start+end;
+		}else{
+			size = end-start ;
 		}
-		
+		if (size == 0) {
+			size = 1;
+		}
+
 		colorDeep = getResources().getColor(R.color.color_deep);
 		colorLight = getResources().getColor(R.color.color_light);
 		colorAwake = getResources().getColor(R.color.color_awak);
@@ -213,7 +221,7 @@ public class SleepCountView extends View {
 		return result;
 	}
 
-	private void drawRect(Canvas canvas) {
+	private void drawRects(Canvas canvas) {
 
 		if (sleeps.length > 0) {
 
@@ -241,20 +249,20 @@ public class SleepCountView extends View {
 					canvas.drawText(hourStr, (size) * perWidth - rectText.width(), getHeight() - spaceY / 2, textPaint);
 				}
 			}
-		}else{
-			float left =0;
+		} else {
+			float left = 0;
 			float top = spaceY;
 			float right = getWidth();
 			float bottom = getHeight() - spaceY;
 			RectF rectF = new RectF(left, top, right, bottom);
 			rectPaint.setColor(colorAwake);
 			canvas.drawRect(rectF, rectPaint);// 画方块
-			
+
 			String hourStrStart = getHourString(start);
 			Rect rectTextStart = new Rect();
 			textPaint.getTextBounds(hourStrStart, 0, hourStrStart.length(), rectTextStart);
 			canvas.drawText(hourStrStart, 0, getHeight() - spaceY / 2, textPaint);
-			
+
 			String hourStrEnd = getHourString(end);
 			Rect rectTextEnd = new Rect();
 			textPaint.getTextBounds(hourStrEnd, 0, hourStrEnd.length(), rectTextEnd);
@@ -275,7 +283,7 @@ public class SleepCountView extends View {
 		String year = sleepData.getYear();
 		String month = sleepData.getMonth();
 		String day = sleepData.getDay();
-		Date datetime = DateUtil.stringToDate(year+month+day, ProtocolForNotify.DATE_FORMAT);
+		Date datetime = DateUtil.stringToDate(year + month + day, ProtocolForNotify.DATE_FORMAT);
 		Calendar c = Calendar.getInstance();
 		c.setTime(datetime);
 		int hour = c.get(Calendar.HOUR_OF_DAY);
@@ -300,44 +308,49 @@ public class SleepCountView extends View {
 		return height;
 	}
 
-	private void parseSleepData(int[] sleeps) {
-		for (int i = 0; i < sleeps.length; i++) {
-			switch (sleeps[i]) {
-			case 0:
-				break;
-			case 1:
-				total += 0.25f;// 获得总的睡眠时间
-				awakTime += 0.75f;
-				light += 0.25;
-				break;
-			case 2:
-				awakTime += 0.25f;
-				light += 0.75f;
-				total += 0.75f;// 获得总的睡眠时间
-				break;
-			case 3:
-				light += 1f;
-				total += 1f;// 获得总的睡眠时间
-				break;
-			case 4:
-				deep += 1f;
-				total += 1f;// 获得总的睡眠时间
-				break;
-			case 5:
-				deep += 1f;
-				total += 1f;// 获得总的睡眠时间
-				break;
-			default:
-				break;
-			}
-		}
-	}
+//	private void parseSleepData(int[] sleeps) {
+//		for (int i = 0; i < sleeps.length; i++) {
+//			switch (sleeps[i]) {
+//			case 0:
+//				awakTime+=1f;
+//				break;
+//			case 1:
+////				total += 0.25f;// 获得总的睡眠时间
+//				awakTime += 0.75f;
+//				light += 0.25;
+//				break;
+//			case 2:
+////				awakTime += 0.25f;
+//				light += 1f;
+////				total += 0.75f;// 获得总的睡眠时间
+//				break;
+//			case 3:
+//				light += 0.75f;
+//				deep+=0.25f;
+////				total += 1f;// 获得总的睡眠时间
+//				break;
+//			case 4:
+//				light+=0.25f ;
+//				deep +=0.75f;
+//				total += 1f;// 获得总的睡眠时间
+//				break;
+//			case 5:
+//				deep += 1f;
+////				total += 1f;// 获得总的睡眠时间
+//				break;
+//			default:
+//				break;
+//			}
+//			
+//			total=(deep+light);
+//		}
+//	}
 
 	private float getSleepValue(int sleep) {
 		// 得到数据。数据说明：0x00-没有数据，0x01-非常差，0x02-差，0x03-中，0x04-好，0x05-非常好
 		Log.v("", "sleep:" + sleep);
 		float result = 0;
-	
+
 		switch (sleep) {
 		case 0:
 			rectPaint.setColor(colorAwake);

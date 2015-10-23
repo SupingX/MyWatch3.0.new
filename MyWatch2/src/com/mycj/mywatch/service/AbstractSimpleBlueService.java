@@ -58,6 +58,11 @@ public abstract class AbstractSimpleBlueService extends Service {
 
 	private int connectState;
 
+	protected List<byte[]> bytes = new ArrayList<byte[]>();
+	public void setBytes(List<byte[]> bytes){
+		this.bytes = bytes;
+	}
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return myBinder;
@@ -125,7 +130,7 @@ public abstract class AbstractSimpleBlueService extends Service {
 	/**
 	 * 查询 未接短信和电话数量 任务
 	 */
-	public Runnable taskIncoming ;
+	public Runnable taskIncoming  ;
 	private final static int DIFF = 6 * 1000; // 4秒运行一次
 	public Handler mHander = new Handler() {
 		public void handleMessage(Message msg) {
@@ -143,6 +148,7 @@ public abstract class AbstractSimpleBlueService extends Service {
 				break;
 			case 0xa1:
 				//来电数量和短信数量
+				
 				mHander.removeCallbacks(taskIncoming);
 				mHander.postDelayed(taskIncoming, DIFF);
 				break;

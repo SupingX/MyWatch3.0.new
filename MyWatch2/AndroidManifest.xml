@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mycj.mywatch"
     android:versionCode="1"
-    android:versionName="1.0.1509251414" >
+    android:versionName="1.0.1510211343" >
 
     <uses-sdk
         android:minSdkVersion="18"
@@ -11,8 +11,6 @@
        
     <!-- 时候前台显示 -->
 	<uses-permission android:name="android.permission.GET_TASKS"/>
-    <!-- 自定义dialog -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <!-- 相机 -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />

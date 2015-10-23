@@ -53,7 +53,7 @@ public class SleepSettingFragment extends BaseFragment implements OnClickListene
 	private void setDefalutValue() {
 		int startHour = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_START_HOUR, 00);
 		int startMin = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_START_MIN, 0);
-		int endHour = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_END_HOUR, 0);
+		int endHour = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_END_HOUR, 23);
 		int endMin = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_END_MIN, 0);
 		
 		tvStartHour.setText(formatValue(startHour));

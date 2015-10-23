@@ -8,7 +8,10 @@ import java.util.List;
 
 
 
+
+
 import com.mycj.mywatch.util.FileUtil;
+import com.mycj.mywatch.util.FileUtils;
 import com.mycj.mywatch.util.ImageUtil;
 
 import android.graphics.Bitmap;
@@ -216,7 +219,7 @@ public class CameraManager {
 			// 保存图片到Sd—card
 			if (null != bitmap) {
 				// 旋转90度
-				Bitmap rotaBitmap = ImageUtil.getRotateBitmap(bitmap, 90.0f);
+				final Bitmap rotaBitmap = ImageUtil.getRotateBitmap(bitmap, 90.0f);
 				new SavePictureTask().execute(rotaBitmap);
 			}
 
@@ -232,18 +235,28 @@ public class CameraManager {
 
 	/** ↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 为了实现拍照的快门声音及拍照保存照片需要下面三个回调变量 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑ **/
 
-	private class SavePictureTask extends AsyncTask<Bitmap, Void, Void> {
+	private class SavePictureTask extends AsyncTask<Bitmap, Void, Boolean> {
 
 		@Override
-		protected Void doInBackground(Bitmap... params) {
+		protected Boolean doInBackground(Bitmap... params) {
 			Log.v(TAG, "<-- 异步存储中...  -->");
 			try {
-				FileUtil.saveBitmap(params[0]);
+				if (params[0]!=null) {
+					FileUtil.saveBitmap(params[0]);
+					return true;
+				}
 			} catch (Exception e) {
 				Log.v(TAG, "<-- 异步存储异常...  -->");
 				e.printStackTrace();
 			}
-			return null;
+			return false;
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean result) {
+			super.onPostExecute(result);
+			
+			
 		}
 
 	}

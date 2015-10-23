@@ -1,8 +1,12 @@
 package com.mycj.mywatch.business;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
 import android.util.Log;
+
 import com.mycj.mywatch.bean.HeartRateData;
 import com.mycj.mywatch.bean.SleepData;
 import com.mycj.mywatch.bean.PedoData;
@@ -324,16 +328,44 @@ public class ProtocolForNotify extends AbstractProtocolForNotify {
 			int sleep22 = Integer.parseInt(sleepVale22, 16);
 			int sleep23 = Integer.parseInt(sleepVale23, 16);
 			int sleep24 = Integer.parseInt(sleepVale24, 16);
-
-			int[] sleeps = new int[] { sleep1, sleep2, sleep3, sleep4, sleep5, sleep6, sleep7, sleep8, sleep9, sleep10, sleep11, sleep12, sleep13, sleep14, sleep15, sleep16, sleep17, sleep18,
-					sleep19, sleep20, sleep21, sleep22, sleep23, sleep24 };
-
-			// new
-			sleepData = new SleepData(sleeps, year,month,day);
-
+			
+			String values = sleep1+","
+					+sleep2+","
+					+sleep3+","
+					+sleep4+","
+					+sleep5+","
+					+sleep6+","
+					+sleep7+","
+					+sleep8+","
+					+sleep9+","
+					+sleep10+","
+					+sleep11+","
+					+sleep12+","
+					+sleep13+","
+					+sleep14+","
+					+sleep15+","
+					+sleep16+","
+					+sleep17+","
+					+sleep18+","
+					+sleep19+","
+					+sleep20+","
+					+sleep21+","
+					+sleep22+","
+					+sleep23+","
+					+sleep24
+					;
+					
+			Log.e("", "______________解析的values ：" + values);
+			sleepData = new SleepData();
+			sleepData.setYear(year);
+			sleepData.setMonth(month);
+			sleepData.setDay(day);
+			sleepData.setSdatas(values);
+			
 		} else {
 			logE("错误的数据");
 		}
+		Log.e("", "______________解析的sleepData ：" + sleepData.toString());
 		return sleepData;
 	}
 
@@ -523,14 +555,34 @@ public class ProtocolForNotify extends AbstractProtocolForNotify {
 			int sleep22 = Integer.parseInt(sleepVale22, 16);
 			int sleep23 = Integer.parseInt(sleepVale23, 16);
 			int sleep24 = Integer.parseInt(sleepVale24, 16);
-			int[] sleeps = new int[] { sleep1, sleep2, sleep3, sleep4, sleep5, sleep6, sleep7, sleep8, sleep9, sleep10, sleep11, sleep12, sleep13, sleep14, sleep15, sleep16, sleep17, sleep18,
-					sleep19, sleep20, sleep21, sleep22, sleep23, sleep24 };
-			for (int i = 0; i < sleeps.length; i++) {
-				Log.e("", "今天的睡眠数据 "+i+":"+ +sleeps[i] );
-			}
 			// new
 			Log.e("", "日期 ：" + historyDate);
-			sleepData = new SleepData(sleeps, year,month,day);
+			String values = sleep1+","
+					+sleep2+","
+					+sleep3+","
+					+sleep4+","
+					+sleep5+","
+					+sleep6+","
+					+sleep7+","
+					+sleep8+","
+					+sleep9+","
+					+sleep10+","
+					+sleep11+","
+					+sleep12+","
+					+sleep13+","
+					+sleep14+","
+					+sleep15+","
+					+sleep16+","
+					+sleep17+","
+					+sleep18+","
+					+sleep19+","
+					+sleep20+","
+					+sleep21+","
+					+sleep22+","
+					+sleep23+","
+					+sleep24
+					;
+			sleepData = new SleepData(values, year,month,day);
 		} else {
 			logE("错误的数据");
 		}

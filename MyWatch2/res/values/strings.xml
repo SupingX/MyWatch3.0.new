@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">MyWatchⅠ</string>
+    <string name="app_name">MyWatch</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_pedometer">PedometerActivity</string>
     <string name="title_activity_heart_rate">HeartRateActivity</string>

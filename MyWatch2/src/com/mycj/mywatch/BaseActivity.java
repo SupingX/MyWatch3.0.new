@@ -3,10 +3,13 @@ package com.mycj.mywatch;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
+import com.mycj.mywatch.bean.Constant;
 import com.mycj.mywatch.service.MusicService;
 import com.mycj.mywatch.service.AbstractSimpleBlueService;
 import com.mycj.mywatch.service.SimpleBlueService;
+import com.mycj.mywatch.util.SharedPreferenceUtil;
 
 import android.animation.ObjectAnimator;
 import android.app.ActivityManager;
@@ -17,12 +20,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -39,7 +45,19 @@ import android.widget.Toast;
  *
  */
 public abstract class BaseActivity extends FragmentActivity {
-
+	public void chooseLau(String language){
+		 Resources res = getResources(); 
+		 Configuration config = res.getConfiguration(); 
+		 DisplayMetrics dm = res.getDisplayMetrics(); 
+		 if (language.equals("zh")) {
+			 config.locale = Locale.SIMPLIFIED_CHINESE; 
+		}else if (language.equals("en")) {
+			 config.locale = Locale.ENGLISH; 
+		}
+		 res.updateConfiguration(config, dm);
+		 SharedPreferenceUtil.put(this,Constant.SHARE_LOCALE , language);
+	}
+	
 	/**
 	 * 屏幕的宽度、高度、密度
 	 */
@@ -50,6 +68,12 @@ public abstract class BaseActivity extends FragmentActivity {
 	
 	protected List<AsyncTask<Void, Void, Boolean>> mAsyncTasks = new ArrayList<AsyncTask<Void, Void, Boolean>>();
 
+	
+	@Override
+	protected void onCreate(Bundle arg0) {
+//		chooseLau((String)SharedPreferenceUtil.get(this, Constant.SHARE_LOCALE, "zh"));
+		super.onCreate(arg0);
+	}
 	
 	
 	@Override

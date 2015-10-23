@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,6 +27,7 @@ import com.mycj.mywatch.bean.CodeDB;
 import com.mycj.mywatch.bean.ConditionWeather;
 import com.mycj.mywatch.bean.Constant;
 import com.mycj.mywatch.bean.PedoData;
+import com.mycj.mywatch.bean.SleepData;
 import com.mycj.mywatch.business.LoadWeatherJsonTask;
 import com.mycj.mywatch.business.LoadWeatherJsonTask.OnProgressChangeListener;
 import com.mycj.mywatch.business.ProtocolForWrite;
@@ -53,6 +55,8 @@ import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
@@ -62,6 +66,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -212,11 +217,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 					break;
 				}
 			} else if (action.equals(SimpleBlueService.ACTION_DATA_HISTORY_SLEEP_FOR_TODAY)) {
-				final int[] sleeps = intent.getIntArrayExtra(SimpleBlueService.EXTRA_SLEEP);
+				final String sleeps = intent.getExtras().getString(SimpleBlueService.EXTRA_SLEEP);
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						tvSleep.setText(parseSleeps(sleeps) + "");
+						String[] split = sleeps.split(",");
+						tvSleep.setText(parseSleeps(split) + "");
 					}
 				});
 			}
@@ -269,10 +275,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 	 * @param sleeps
 	 * @return
 	 */
-	private float parseSleeps(int[] sleeps) {
+	private float parseSleeps(String[] sleeps) {
 		float total = 0f;
 		for (int i = 0; i < sleeps.length; i++) {
-			switch (sleeps[i]) {
+			switch (Integer.valueOf(sleeps[i])) {
 			case 0:
 				break;
 			case 1:
@@ -405,7 +411,23 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 		initViews();
 		setListener();
 		// mHandler.postDelayed(taskState,2000);
-
+		
+		Bundle b = getIntent().getExtras();
+		if (b!=null) {
+			byte[] byteForSyncTime = b.getByteArray("byteForSyncTime");
+			byte[] byteForSleepTime = b.getByteArray("byteForSleepTime");
+			byte[] byteForHeartRate = b.getByteArray("byteForHeartRate");
+			byte[] byteForAlarmClock = b.getByteArray("byteForAlarmClock");
+			byte[] byteForSleepQualityOfToday = b.getByteArray("byteForSleepQualityOfToday");
+			
+			values = new ArrayList<>();
+			values.add(byteForSyncTime);
+			values.add(byteForSleepTime);
+			values.add(byteForHeartRate);
+			values.add(byteForAlarmClock);
+			values.add(byteForSleepQualityOfToday);
+		}
+		
 	}
 
 	@Override
@@ -422,6 +444,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 			}
 		};
 		mSimpleBlueService = getSimpleBlueService();
+		mSimpleBlueService.setBytes(values);
 		Log.e("", "mSimpleBlueService : " + mSimpleBlueService);
 		registerReceiver(mReceiver, SimpleBlueService.getIntentFilter());
 
@@ -666,6 +689,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 	}
 
 	private boolean isOnceEnter = true;
+	private List<byte[]> values;
 
 	/**
 	 * 检查蓝牙
@@ -796,19 +820,20 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 
 	@Override
 	public void onBackPressed() {
-
+//		chooseLau("zh");
 		ActionSheetDialog exitDialog = new ActionSheetDialog(this).builder();
 		exitDialog.setTitle("退出程序？");
 		exitDialog.addSheetItem("确定", SheetItemColor.Red, new OnSheetItemClickListener() {
 			@Override
 			public void onClick(int which) {
+				mSimpleBlueService.close();
 				finish();
 				System.exit(0);
 			}
 		}).show();
 		// super.onBackPressed();
-		int tempInt = Integer.valueOf("-20");
-		Log.e("", "________________________tempInt : " + tempInt);
+//		int tempInt = Integer.valueOf("-20");
+//		Log.e("", "________________________tempInt : " + tempInt);
 
 		// for test
 		// mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForWeather(0x01,
@@ -816,7 +841,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 		// showdialog("hahhahah");
 		// findStepDateByDate();
 
-	
+//		List<SleepData> sleepDatas = DataSupport.findAll(SleepData.class);
+//		if (sleepDatas!=null ) {
+//			Log.i("____sleepData : ", "____sleepData : "+sleepDatas.size()+"个");
+//			if (sleepDatas.size()>0) {
+//				for (SleepData sleepData : sleepDatas) {
+//					Log.i("____sleepData : ", sleepData.toString());
+//				}
+//			}
+//		}
 //		mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForHeartRate(44, 244));
 
 	}

@@ -1,6 +1,9 @@
 package com.mycj.mywatch.activity;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mycj.mywatch.BaseActivity;
 import com.mycj.mywatch.R;
 import com.mycj.mywatch.fragment.HeartRateFragment;
@@ -9,15 +12,16 @@ import com.mycj.mywatch.fragment.HeartRateSettingFragment;
 import com.mycj.mywatch.util.FileUtil;
 import com.mycj.mywatch.util.ScreenShot;
 import com.mycj.mywatch.util.ShareUtil;
+import com.mycj.mywatch.view.NoScrollViewPager;
 
-import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,7 +30,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-@SuppressLint("CommitTransaction")
 public class HeartRateActivity extends BaseActivity implements OnClickListener{
 
 	private TextView tvHreatRate;
@@ -37,6 +40,8 @@ public class HeartRateActivity extends BaseActivity implements OnClickListener{
 	private HeartRateFragment hrFragment;
 	private HeartRateHistoryFragment hrHistoryFragment;
 	private HeartRateSettingFragment hrSettingFragment;
+	private NoScrollViewPager hrViewPager;
+	private List<Fragment> fragments;
 //	private TextView tvSave;
 	private Handler mHandler = new Handler(){
 		public void handleMessage(Message msg) {
@@ -66,6 +71,26 @@ public class HeartRateActivity extends BaseActivity implements OnClickListener{
 		tvTitle = (TextView) findViewById(R.id.tv_pedo_title);
 		rlBack = (FrameLayout) findViewById(R.id.fl_home);
 		imgShare = (ImageView) findViewById(R.id.img_share);
+		// 加载ViewPager
+				hrViewPager = (NoScrollViewPager) findViewById(R.id.vp_hr);
+				fragments = new ArrayList<>();
+				hrFragment = new HeartRateFragment();
+				hrHistoryFragment = new HeartRateHistoryFragment();
+				hrSettingFragment = new HeartRateSettingFragment();
+				fragments.add(hrFragment);
+				fragments.add(hrHistoryFragment);
+				fragments.add(hrSettingFragment);
+				hrViewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+					@Override
+					public int getCount() {
+						return fragments.size();
+					}
+
+					@Override
+					public Fragment getItem(int pos) {
+						return fragments.get(pos);
+					}
+				});
 	
 	}
 
@@ -113,53 +138,84 @@ public class HeartRateActivity extends BaseActivity implements OnClickListener{
 			break;
 		}
 	}
+	
+	private void updateTab(int i) {
+		clearTab();
+		switch (i) {
+		case 0:
+			hrViewPager.setCurrentItem(0);
+			tvHreatRate.setTextColor(getResources().getColor(R.color.color_top_blue));
+			tvTitle.setText(getResources().getString(R.string.heart_rate));
+			setDrawable(tvHreatRate, R.drawable.ic_tab_hr);
+			imgShare.setVisibility(View.VISIBLE);
+			break;
+		case 1:
+			hrViewPager.setCurrentItem(1);
+			imgShare.setVisibility(View.GONE);
+			tvTitle.setText(getResources().getString(R.string.history));
+			tvHistory.setTextColor(getResources().getColor(R.color.color_top_blue));
+			setDrawable(tvHistory, R.drawable.ic_pedo_tab_history);
+			break;
+		case 2:
+			hrViewPager.setCurrentItem(2);
+			imgShare.setVisibility(View.GONE);
+			tvTitle.setText(getResources().getString(R.string.setting));
+			tvSetting.setTextColor(getResources().getColor(R.color.color_top_blue));
+			setDrawable(tvSetting, R.drawable.ic_pedo_tab_setting);
+			break;
 
+		default:
+			break;
+		}
+	}
 	/**
 		 * 更新底部选中状态
 		 * @param id
 		 */
-		private void updateTab(int id) {
-			clearTab();
-			FragmentTransaction beginTransaction = getSupportFragmentManager().beginTransaction();
-			switch (id) {
-			case 0:
-				tvHreatRate.setTextColor(getResources().getColor(R.color.color_top_blue));
-				tvTitle.setText(getResources().getString(R.string.heart_rate));
-				setDrawable(tvHreatRate, R.drawable.ic_tab_hr);
-				imgShare.setVisibility(View.VISIBLE);
-				if(hrFragment==null){
-					hrFragment = new HeartRateFragment();
-				}
-				beginTransaction.replace(R.id.frame_heart_rate, hrFragment);
-				break;
-			case 1:
-				if(hrHistoryFragment==null){
-					hrHistoryFragment = new HeartRateHistoryFragment();
-				}
-				imgShare.setVisibility(View.GONE);
-				tvTitle.setText(getResources().getString(R.string.history));
-				beginTransaction.replace(R.id.frame_heart_rate, hrHistoryFragment);
-				tvHistory.setTextColor(getResources().getColor(R.color.color_top_blue));
-				setDrawable(tvHistory, R.drawable.ic_pedo_tab_history);
-				break;
-			case 2:
-				if(hrSettingFragment==null){
-					hrSettingFragment = new HeartRateSettingFragment();
-				}
-				imgShare.setVisibility(View.GONE);
-				tvTitle.setText(getResources().getString(R.string.setting));
-				beginTransaction.replace(R.id.frame_heart_rate, hrSettingFragment);
-				tvSetting.setTextColor(getResources().getColor(R.color.color_top_blue));
-				setDrawable(tvSetting, R.drawable.ic_pedo_tab_setting);
-				break;
-	
-			default:
-				break;
-			}
+//		private void updateTab(int id) {
+//			clearTab();
+//			FragmentTransaction beginTransaction = getSupportFragmentManager().beginTransaction();
+//			switch (id) {
+//			case 0:
+//				tvHreatRate.setTextColor(getResources().getColor(R.color.color_top_blue));
+//				tvTitle.setText(getResources().getString(R.string.heart_rate));
+//				setDrawable(tvHreatRate, R.drawable.ic_tab_hr);
+//				imgShare.setVisibility(View.VISIBLE);
+//				if(hrFragment==null){
+//					hrFragment = new HeartRateFragment();
+//				}
+//				beginTransaction.replace(R.id.frame_heart_rate, hrFragment);
+//				break;
+//			case 1:
+//				if(hrHistoryFragment==null){
+//					hrHistoryFragment = new HeartRateHistoryFragment();
+//				}
+//				imgShare.setVisibility(View.GONE);
+//				tvTitle.setText(getResources().getString(R.string.history));
+//				beginTransaction.replace(R.id.frame_heart_rate, hrHistoryFragment);
+//				tvHistory.setTextColor(getResources().getColor(R.color.color_top_blue));
+//				setDrawable(tvHistory, R.drawable.ic_pedo_tab_history);
+//				break;
+//			case 2:
+//				if(hrSettingFragment==null){
+//					hrSettingFragment = new HeartRateSettingFragment();
+//				}
+//				imgShare.setVisibility(View.GONE);
+//				tvTitle.setText(getResources().getString(R.string.setting));
+//				beginTransaction.replace(R.id.frame_heart_rate, hrSettingFragment);
+//				tvSetting.setTextColor(getResources().getColor(R.color.color_top_blue));
+//				setDrawable(tvSetting, R.drawable.ic_pedo_tab_setting);
+//				break;
+//	
+//			default:
+//				break;
+//			}
 //			beginTransaction.addToBackStack(null);
-			beginTransaction.commitAllowingStateLoss();
-	//		beginTransaction.commit();
-		}
+//			beginTransaction.commitAllowingStateLoss();
+//	//		beginTransaction.commit();
+//		}
+
+
 
 	/**
 	 * 清楚底部选中状态

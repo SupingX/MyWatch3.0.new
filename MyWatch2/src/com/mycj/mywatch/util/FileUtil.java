@@ -16,7 +16,6 @@ public class FileUtil {
 	 private static final  String TAG = "FileUtil";  
 //	    private static final File parentPath = Environment.getExternalStorageDirectory();  
 	    private static final File parentPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-	    
 	    private static   String storagePath = "";  
 	    private static final String DST_FOLDER_NAME = "MyWatch";  
 	  
@@ -34,7 +33,8 @@ public class FileUtil {
 			// 判断SDCard是否存在
 			boolean sdcardExist = Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
 			if (sdcardExist) {
-				sdcardDir = Environment.getExternalStorageDirectory();
+//				sdcardDir = parentPath;
+				sdcardDir = Environment.getExternalStorageDirectory();  
 			}else{
 			
 			}
@@ -47,7 +47,8 @@ public class FileUtil {
 		public static  String getandSaveCurrentImage(Activity ac,Bitmap Bmp) {
 			String filepath ="";
 			// 图片存储路径
-			String savePath = getSDCardPath() + "/DST_FOLDER_NAME/ScreenImages";
+			String savePath = getSDCardPath() + "/"+DST_FOLDER_NAME+"/ScreenImages";
+			
 			if (savePath==null) {
 				Toast.makeText(ac, "Sd卡不可用", Toast.LENGTH_SHORT).show();
 				return null;
@@ -70,7 +71,7 @@ public class FileUtil {
 					Bmp.compress(Bitmap.CompressFormat.PNG, 90, fos);
 					fos.flush();
 					fos.close();
-					Toast.makeText(ac, "分享文件已保存至"+savePath+"目录下", Toast.LENGTH_SHORT).show();
+//					Toast.makeText(ac, "分享文件已保存至"+savePath+"目录下", Toast.LENGTH_SHORT).show();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -79,51 +80,39 @@ public class FileUtil {
 			return filepath;
 		}
 	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
-	    
 	    /**初始化保存路径 
 	     * @return 
 	     */  
 	    private static String initPath(){  
-	        if(storagePath.equals("")){  
-	            storagePath = parentPath.getAbsolutePath()+"/" + DST_FOLDER_NAME;  
-	            File f = new File(storagePath);  
-	            if(!f.exists()){  
-	                f.mkdir();  
-	            }  
-	        }  
-	        return storagePath;  
+	    	if (storagePath.equals("")) {
+				storagePath = parentPath.getAbsolutePath() + "/" + DST_FOLDER_NAME;
+				File f = new File(storagePath);
+				if (!f.exists()) {
+					f.mkdir();
+				}
+			}
+			return storagePath;
 	    }  
 	  
 	    /**保存Bitmap到sdcard 
 	     * @param b 
 	     */  
 	    public static void saveBitmap(Bitmap b){  
-	  
-	        String path = initPath();  
-	        long dataTake = System.currentTimeMillis();  
-	        String jpegName = path + "/" + dataTake +".jpg";  
-	        Log.i(TAG, "<!-- saveBitmap:jpegName = " + jpegName +" -->");  
-	        try {  
-	            FileOutputStream fout = new FileOutputStream(jpegName);  
-	            BufferedOutputStream bos = new BufferedOutputStream(fout);  
-	            b.compress(Bitmap.CompressFormat.JPEG, 100, bos);  
-	            bos.flush();  
-	            bos.close();  
-	            Log.i(TAG, "<!-- saveBitmap:成功 -->");  
-	        } catch (IOException e) {  
-	            // TODO Auto-generated catch block  
-	            Log.i(TAG, "<!-- saveBitmap:失败 -->");  
-	            e.printStackTrace();  
-	        }  
+			String path = initPath();
+			long dataTake = System.currentTimeMillis();
+			String jpegName = path + "/" + dataTake + ".jpg";
+			Log.i(TAG, "saveBitmap:jpegName = " + jpegName);
+			try {
+				FileOutputStream fout = new FileOutputStream(jpegName);
+				BufferedOutputStream bos = new BufferedOutputStream(fout);
+				b.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+				bos.flush();
+				bos.close();
+				Log.i(TAG, "saveBitmap成功");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				Log.i(TAG, "saveBitmap:失败");
+				e.printStackTrace();
+			}
 	    }  
 }

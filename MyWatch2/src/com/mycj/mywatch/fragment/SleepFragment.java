@@ -22,9 +22,11 @@ import com.mycj.mywatch.BaseFragment;
 import com.mycj.mywatch.R;
 import com.mycj.mywatch.bean.Constant;
 import com.mycj.mywatch.bean.SleepData;
+import com.mycj.mywatch.business.ParseSleepData;
 import com.mycj.mywatch.business.ProtocolForWrite;
 import com.mycj.mywatch.service.AbstractSimpleBlueService;
 import com.mycj.mywatch.service.SimpleBlueService;
+import com.mycj.mywatch.util.DataUtil;
 import com.mycj.mywatch.util.DateUtil;
 import com.mycj.mywatch.util.SharedPreferenceUtil;
 import com.mycj.mywatch.view.SleepCountView;
@@ -57,16 +59,31 @@ public class SleepFragment extends BaseFragment implements OnClickListener{
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			if(action.equals(SimpleBlueService.ACTION_DATA_HISTORY_SLEEP_FOR_TODAY)){
-				final int [] sleeps = intent.getIntArrayExtra(SimpleBlueService.EXTRA_SLEEP);
+				final String sleeps = intent.getExtras().getString(SimpleBlueService.EXTRA_SLEEP);
 				mhandler.post(new Runnable() {
 					@Override
 					public void run() {
 						Log.e("SleepFragment", "当天的睡眠数据sleeps :" + sleeps);
-						sleepCountView.setSleepData(sleeps);
-						tvAwak.setText(sleepCountView.getAwak()+"");
-						tvTotal.setText(sleepCountView.getTotal()+"");
-						tvDeep.setText(sleepCountView.getDeep()+"");
-						tvLight.setText(sleepCountView.getLight()+"");
+						String[] split = sleeps.split(",");
+						Log.i("", "split :" + split);
+						int [] datas = new int[24];
+						for (int i = 0; i < split.length; i++) {
+							datas[i] = Integer.valueOf(split[i]);
+						}
+						sleepCountView.setSleepData(datas);
+						float[] parseSleepData = ParseSleepData.parseSleepData(datas);
+						float deep = parseSleepData[2];
+						float light = parseSleepData[1];
+						float awak = parseSleepData[0];
+						tvTotal.setText((deep+light)+"");
+						tvDeep.setText(deep+"");
+						tvLight.setText(light+"");
+//						tvAwak.setText(sleepCountView.getAwak()+"");
+						awak = size - deep-light;
+						if (awak<0) {
+							awak=0;
+						}
+						tvAwak.setText((awak)+"");
 						
 					}
 				});
@@ -74,7 +91,10 @@ public class SleepFragment extends BaseFragment implements OnClickListener{
 		}
 		
 	};
+	private int size;
 
+	
+	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -90,21 +110,26 @@ public class SleepFragment extends BaseFragment implements OnClickListener{
 		super.onStart();
 		mSimpleBlueService = getSimpleBlueService();
 		getActivity().registerReceiver(mReceiver, SimpleBlueService.getIntentFilter());
-	}
-	
-	@Override
-	public void onResume() {
-		updateTextDay(new Date());
-		getActivity().registerReceiver(mReceiver, SimpleBlueService.getIntentFilter());
 		byte[] data = ProtocolForWrite.instance().getByteForSleepQualityOfToday(0);
 		Log.e("", "data : " + data+"_____________________________");
 		if (null!=mSimpleBlueService&&mSimpleBlueService.isBinded()&&mSimpleBlueService.getConnectState()==BluetoothProfile.STATE_CONNECTED) {
 			mSimpleBlueService.writeCharacteristic(data);
 		}
-		
-		
-//		sleepCountView.setSleepData(new int[]{1,2,3,4,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,2});
+	}
+	
+	@Override
+	public void onResume() {
 		super.onResume();
+		updateTextDay(new Date());
+		int start = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_START_HOUR, 0);
+		int end = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_END_HOUR, 23);
+		if (start>end) {
+			size = (24-start)+end;
+		}else{
+			size = end-start;
+		}
+		tvAwak.setText(DataUtil.format1(size));
+		
 	}
 	@Override
 	public void onStop() {
@@ -156,9 +181,7 @@ public class SleepFragment extends BaseFragment implements OnClickListener{
 		
 		sleepCountView = (SleepCountView) view.findViewById(R.id.sleep_count);
 //		tvTotal.setText(""+sleepCountView.getsize());
-		int start = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_START_HOUR, 0);
-		int end = (int) SharedPreferenceUtil.get(getActivity(), Constant.SHARE_SLEEP_END_HOUR, 23);
-		int size = Math.abs(end - start);
+	
 //		tvAwak.setText(""+size);
 		
 	}
@@ -172,15 +195,17 @@ public class SleepFragment extends BaseFragment implements OnClickListener{
 			public void next() {
 			}
 		});
-		sleepCountView.setOnSleepDataChangeListener(new OnSleepDataChangeListener() {
-			@Override
-			public void onchange(int[]sleeps) {
-				tvAwak.setText(sleepCountView.getAwak()+"");
-				tvDeep.setText(sleepCountView.getDeep()+"");
-				tvLight.setText(sleepCountView.getLight()+"");
-				tvTotal.setText(sleepCountView.getTotal()+"");
-			}
-		});
+//		sleepCountView.setOnSleepDataChangeListener(new OnSleepDataChangeListener() {
+//			@Override
+//			public void onchange(int[]sleeps) {
+//				tvAwak.setText((size-sleepCountView.getTotal())+"");
+////				tvAwak.setText(sleepCountView.getAwak()+"");
+//				tvDeep.setText(sleepCountView.getDeep()+"");
+//				tvLight.setText(sleepCountView.getLight()+"");
+//				tvTotal.setText(sleepCountView.getTotal()+"");
+//				
+//			}
+//		});
 	}
 
 	private void updateTextDay(Date date){

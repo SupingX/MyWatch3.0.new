@@ -1,5 +1,8 @@
 package com.mycj.mywatch.activity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mycj.mywatch.BaseActivity;
 import com.mycj.mywatch.R;
 import com.mycj.mywatch.business.ProtocolForWrite;
@@ -7,10 +10,11 @@ import com.mycj.mywatch.fragment.SleepFragment;
 import com.mycj.mywatch.fragment.SleepHistoryFragment;
 import com.mycj.mywatch.fragment.SleepSettingFragment;
 import com.mycj.mywatch.service.AbstractSimpleBlueService;
-import com.mycj.mywatch.service.SimpleBlueService;
 import com.mycj.mywatch.util.FileUtil;
+import com.mycj.mywatch.util.FileUtils;
 import com.mycj.mywatch.util.ScreenShot;
 import com.mycj.mywatch.util.ShareUtil;
+import com.mycj.mywatch.view.NoScrollViewPager;
 
 import android.animation.ObjectAnimator;
 import android.bluetooth.BluetoothProfile;
@@ -20,7 +24,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
@@ -34,11 +39,13 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 	private SleepFragment sleepFragment;
 	private SleepHistoryFragment sleepHistoryFragment;
 	private SleepSettingFragment sleepSettingFragment;
+	private NoScrollViewPager sleepViewPager;
+	private List<Fragment> fragments;
+	
 	private FrameLayout flBack;
 	// private ImageView imgSync;s
 	// private FrameLayout flSync;
 	private ObjectAnimator startAnimation;
-	private boolean isSyncing;
 	private TextView tvTitle;
 	private AbstractSimpleBlueService mSimpleBlueService;
 	private Handler mHandler = new Handler() {
@@ -57,6 +64,7 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 		setListener();
 		// 初始化tab
 		updateTab(0);
+		
 	}
 
 	@Override
@@ -68,6 +76,7 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		//获取今天的睡眠记录
 		if (null != mSimpleBlueService && mSimpleBlueService.isBinded() && mSimpleBlueService.getConnectState() == BluetoothProfile.STATE_CONNECTED) {
 			byte[] data = ProtocolForWrite.instance().getByteForSleepQualityOfToday(0);
 			mSimpleBlueService.writeCharacteristic(data);
@@ -92,7 +101,28 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 		// flSync = (FrameLayout) findViewById(R.id.fl_sync);
 		// imgSync = (ImageView) findViewById(R.id.img_sync_sleep);
 		imgShare = (ImageView) findViewById(R.id.img_share);
-
+		
+		//加载ViewPager
+		sleepViewPager = (NoScrollViewPager) findViewById(R.id.vp_sleep);
+		fragments = new ArrayList<>();
+		sleepFragment = new SleepFragment();
+		sleepHistoryFragment = new SleepHistoryFragment();
+		sleepSettingFragment = new SleepSettingFragment();
+		fragments.add(sleepFragment);
+		fragments.add(sleepHistoryFragment);
+		fragments.add(sleepSettingFragment);
+		
+		sleepViewPager.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
+			@Override
+			public int getCount() {
+				return fragments.size();
+			}
+			
+			@Override
+			public Fragment getItem(int pos) {
+				return fragments.get(pos);
+			}
+		});
 	}
 
 	@Override
@@ -130,6 +160,7 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 				@Override
 				public void run() {
 					Bitmap bitmap = ScreenShot.takeScreenShot(SleepActivity.this);
+					FileUtil.saveBitmap(bitmap);
 					String path = FileUtil.getandSaveCurrentImage(SleepActivity.this, bitmap);
 					if (path != null) {
 						Message msg = new Message();
@@ -167,6 +198,33 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 		}
 	}
 
+	private void updateTab(int i) {
+		clearTab();
+		switch (i) {
+		case 0:
+			sleepViewPager.setCurrentItem(0);
+			tvSleep.setTextColor(getResources().getColor(R.color.color_top_blue));
+			setDrawable(tvSleep, R.drawable.ic_sleep_icon);
+			imgShare.setVisibility(View.VISIBLE);
+			break;
+		case 1:
+			sleepViewPager.setCurrentItem(1);
+			tvHistory.setTextColor(getResources().getColor(R.color.color_top_blue));
+			setDrawable(tvHistory, R.drawable.ic_pedo_tab_history);
+			imgShare.setVisibility(View.GONE);
+			break;
+		case 2:
+			sleepViewPager.setCurrentItem(2);
+			tvSetting.setTextColor(getResources().getColor(R.color.color_top_blue));
+			setDrawable(tvSetting, R.drawable.ic_pedo_tab_setting);
+			imgShare.setVisibility(View.GONE);
+			break;
+
+		default:
+			break;
+		}
+	}
+
 	/**
 	 * 设置TextView 图片
 	 * 
@@ -186,48 +244,48 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 	 * 
 	 * @param id
 	 */
-	private void updateTab(int id) {
-		clearTab();
-		FragmentTransaction beginTransaction = getSupportFragmentManager().beginTransaction();
-		switch (id) {
-		case 0:
-			tvSleep.setTextColor(getResources().getColor(R.color.color_top_blue));
-			setDrawable(tvSleep, R.drawable.ic_sleep_icon);
-			if (sleepFragment == null) {
-				sleepFragment = new SleepFragment();
-			}
-			imgShare.setVisibility(View.VISIBLE);
-			// imgSync.setVisibility(View.GONE);
-			beginTransaction.replace(R.id.frame_sleep, sleepFragment);
-			break;
-		case 1:
-			if (sleepHistoryFragment == null) {
-				sleepHistoryFragment = new SleepHistoryFragment();
-			}
-			beginTransaction.replace(R.id.frame_sleep, sleepHistoryFragment);
-			tvHistory.setTextColor(getResources().getColor(R.color.color_top_blue));
-			setDrawable(tvHistory, R.drawable.ic_pedo_tab_history);
-			imgShare.setVisibility(View.GONE);
-			// imgSync.setVisibility(View.VISIBLE);
-			break;
-		case 2:
-			if (sleepSettingFragment == null) {
-				sleepSettingFragment = new SleepSettingFragment();
-			}
-			beginTransaction.replace(R.id.frame_sleep, sleepSettingFragment);
-			tvSetting.setTextColor(getResources().getColor(R.color.color_top_blue));
-			setDrawable(tvSetting, R.drawable.ic_pedo_tab_setting);
-			imgShare.setVisibility(View.GONE);
-			// imgSync.setVisibility(View.GONE);
-			break;
-
-		default:
-			break;
-		}
-		// beginTransaction.addToBackStack(null);
-		beginTransaction.commitAllowingStateLoss();
-		// beginTransaction.commit();
-	}
+//	private void updateTab(int id) {
+//		clearTab();
+//		FragmentTransaction beginTransaction = getSupportFragmentManager().beginTransaction();
+//		switch (id) {
+//		case 0:
+//			tvSleep.setTextColor(getResources().getColor(R.color.color_top_blue));
+//			setDrawable(tvSleep, R.drawable.ic_sleep_icon);
+//			if (sleepFragment == null) {
+//				sleepFragment = new SleepFragment();
+//			}
+//			imgShare.setVisibility(View.VISIBLE);
+//			// imgSync.setVisibility(View.GONE);
+//			beginTransaction.replace(R.id.frame_sleep, sleepFragment);
+//			break;
+//		case 1:
+//			if (sleepHistoryFragment == null) {
+//				sleepHistoryFragment = new SleepHistoryFragment();
+//			}
+//			beginTransaction.replace(R.id.frame_sleep, sleepHistoryFragment);
+//			tvHistory.setTextColor(getResources().getColor(R.color.color_top_blue));
+//			setDrawable(tvHistory, R.drawable.ic_pedo_tab_history);
+//			imgShare.setVisibility(View.GONE);
+//			// imgSync.setVisibility(View.VISIBLE);
+//			break;
+//		case 2:
+//			if (sleepSettingFragment == null) {
+//				sleepSettingFragment = new SleepSettingFragment();
+//			}
+//			beginTransaction.replace(R.id.frame_sleep, sleepSettingFragment);
+//			tvSetting.setTextColor(getResources().getColor(R.color.color_top_blue));
+//			setDrawable(tvSetting, R.drawable.ic_pedo_tab_setting);
+//			imgShare.setVisibility(View.GONE);
+//			// imgSync.setVisibility(View.GONE);
+//			break;
+//
+//		default:
+//			break;
+//		}
+//		 beginTransaction.addToBackStack(null);
+//		beginTransaction.commitAllowingStateLoss();
+//		// beginTransaction.commit();
+//	}
 
 	/**
 	 * 清楚底部选中状态
@@ -241,10 +299,5 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 		setDrawable(tvSetting, R.drawable.ic_pedo_tab_setting_unpress);
 	}
 
-	@Override
-	public void onBackPressed() {
-		finish();
-		super.onBackPressed();
-	}
 
 }

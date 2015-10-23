@@ -36,6 +36,20 @@
                 android:clickable="false"
                 android:src="@drawable/ic_home_page_icon" />
         </FrameLayout>
+
+      <!--    <TextView
+             android:id="@+id/tv_language"
+             android:clickable="true"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_alignParentRight="true"
+             android:layout_centerVertical="true"
+             android:text="语言选择"
+             android:padding="4dp"
+             android:textColor="@color/white"
+             android:textSize="14sp"
+              /> -->
+
     </RelativeLayout>
 
     <View
@@ -352,4 +366,6 @@
         android:layout_width="match_parent"
         android:layout_height="0.1px"
         android:background="@color/alertdialog_line" />
+    
+    
 </LinearLayout>

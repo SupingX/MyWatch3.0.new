@@ -1,5 +1,7 @@
 package com.mycj.mywatch.util;
 
+import android.util.Log;
+
 /**
  * 通用公式 : 能量消耗 (kcal) = 0.43 * 身高 (cm) + 0.57 * 体重 (kg) + 0.26 * 步频(步/min) + 0.92 * 时间(min) - 108.44
 
@@ -56,7 +58,9 @@ public class WatchDataUtil {
 	 * @return
 	 */
 	public static float getDistance(float step,int height){
-		return step * getStepPerWidth(height);
+		 float distance = step * getStepPerWidth(height);
+	
+		return distance;
 	}
 	
 }

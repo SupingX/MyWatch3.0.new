@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -223,15 +224,17 @@ public class MusicActivity extends BaseActivity implements OnClickListener {
 		listViewMusic.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				int index = listViewMusic.getFirstVisiblePosition()+position;
-				Music music = listMusics.get(index);
+//				int index = listViewMusic.getFirstVisiblePosition()+position;
+				Music music = listMusics.get(position);
 				long musicID = music.getId();
 				Uri uri = MusicLoader.getMusicUriById(musicID);
 				Log.d("", "uri : " + uri);
 				musicSerivce.play(uri);
-				musicSerivce.setPlayingPosition(index);
+				musicSerivce.setPlayingPosition(position);
 //				setCurrentMusicBackground(position);
 				setMusicButtonStartOrStop(musicSerivce.isPlaying());
+				musicAdapter2.setSelect(position);
+				
 			}
 		});
 	}
@@ -249,15 +252,16 @@ public class MusicActivity extends BaseActivity implements OnClickListener {
 	 * 设置选中的音乐背景;
 	 */
 	private void setCurrentMusicBackground(int pos) {
-		Log.v("", "当前播放音乐pos :" + pos);
-		if (pos>-1) {
-			View view = listViewMusic.getChildAt(pos-listViewMusic.getFirstVisiblePosition());
-			Log.v("", "当前view :" + view);
-			clearBgColor();
-			if (view != null) {
-				view.setBackgroundColor(getResources().getColor(R.color.grey_light));
-			}
-		}
+//		Log.v("", "当前播放音乐pos :" + pos);
+//		if (pos>-1) {
+//			View view = listViewMusic.getChildAt(pos-listViewMusic.getFirstVisiblePosition());
+//			Log.v("", "当前view :" + view);
+//			clearBgColor();
+//			if (view != null) {
+//				view.setBackgroundColor(getResources().getColor(R.color.grey_light));
+//			}
+//		}
+		musicAdapter2.setSelect(musicSerivce.getPlayingPosition());
 	}
 
 	private void initMusic() {
@@ -320,7 +324,9 @@ public class MusicActivity extends BaseActivity implements OnClickListener {
 		public long getItemId(int position) {
 			return position;
 		}
-
+		
+		private int select=-1;
+		
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			ViewHolder holder = null;
@@ -343,10 +349,21 @@ public class MusicActivity extends BaseActivity implements OnClickListener {
 			}else{
 				holder.imgView.setImageBitmap(art);
 			}
-		
+			
+			if (select==position) {
+				convertView.setBackgroundColor(Color.LTGRAY);
+			}else if (select==-1) {
+				
+			}else{
+				convertView.setBackgroundColor(Color.WHITE);
+			}
 			return convertView;
 		}
-
+		
+		public void setSelect(int select){
+			this.select = select;
+			notifyDataSetChanged();
+		}
 		class ViewHolder {
 			public TextView tvTitle, tvSinger;
 			public ImageView imgView;

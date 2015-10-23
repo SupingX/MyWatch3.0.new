@@ -101,29 +101,7 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 			}
 		}, 2000);
 		
-		taskIncoming = new Runnable() {
-			@Override
-			public void run() {
-				int mmsCount = MessageUtil.getNewMmsCount(getApplicationContext());
-				int msmCount = MessageUtil.getNewSmsCount(getApplicationContext());
-				int phoneCount = MessageUtil.readMissCall(getApplicationContext());
-				Log.e("BaseApp", "____电话数量 ： "+phoneNo +"-->"+phoneCount);
-				Log.e("BaseApp", "____短信 ： " + smsMNo+"-->"+(msmCount+mmsCount) +(smsMNo != (mmsCount + msmCount)));
-				// 数量只要有一个变化就发送
-				if (phoneNo != phoneCount || smsMNo != (mmsCount + msmCount)) {
-					Log.e("BaseApp", "_______________________________________________________________________________________读取短信和电话数量 ： 有变化");
-//					if (mmsCount == 0 && msmCount == 0 && phoneCount == 0) {
-//						doWriteUnReadPhoneAndSmsToWatch(0, 0);
-//						return;
-//					} else {
-						doWriteUnReadPhoneAndSmsToWatch(phoneCount, (mmsCount+msmCount));
-//					}
-				}else{
-					Log.e("BaseApp", "__读取短信和电话数量 ： 无变化");
-				}
-				mHander.sendEmptyMessage(0xa1);
-			}
-		};
+	
 	}
 
 	@Override
@@ -404,7 +382,18 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
-						notifyForHistoryDataToSleepData.save();
+						Log.e("day", "notifyForHistoryDataToSleepData : " + notifyForHistoryDataToSleepData.toString());
+						String year = notifyForHistoryDataToSleepData.getYear();
+						String month = notifyForHistoryDataToSleepData.getMonth();
+						String day = notifyForHistoryDataToSleepData.getDay();
+						Log.e("day", "day : " + day);
+						List<SleepData> sleepDatas = DataSupport.where("year=? and month=? and day=?", year, month, day).find(SleepData.class);
+						if (sleepDatas!=null && sleepDatas.size()>0) {
+							sleepDatas.get(0).setSdatas(notifyForHistoryDataToSleepData.getSdatas());
+							sleepDatas.get(0).save();
+						}else{
+							notifyForHistoryDataToSleepData.save();
+						}
 					}
 				}).start();
 			}
@@ -487,7 +476,7 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 			// 历史数据 -- 今天睡眠数据
 			SleepData todaySleepData = notify.notifyForHistoryDataToTodaySleepData(data);
 			if (todaySleepData != null) {
-				bleDataForSleep(todaySleepData.getSleeps());
+				bleDataForSleep(todaySleepData.getSdatas());
 			}
 			break;
 
@@ -550,6 +539,31 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 	};
 	@Override
 	public void onServicediscoveredSuccess() {
+		taskIncoming = new Runnable() {
+			@Override
+			public void run() {
+				int mmsCount = MessageUtil.getNewMmsCount(getApplicationContext());
+				int msmCount = MessageUtil.getNewSmsCount(getApplicationContext());
+				int phoneCount = MessageUtil.readMissCall(getApplicationContext());
+				Log.e("BaseApp", "____电话数量 ： "+phoneNo +"-->"+phoneCount);
+				Log.e("BaseApp", "____短信 ： " + smsMNo+"-->"+(msmCount+mmsCount) +(smsMNo != (mmsCount + msmCount)));
+				// 数量只要有一个变化就发送
+				if (phoneNo != phoneCount || smsMNo != (mmsCount + msmCount)) {
+					Log.e("BaseApp", "_______________________________________________________________________________________读取短信和电话数量 ： 有变化");
+//					if (mmsCount == 0 && msmCount == 0 && phoneCount == 0) {
+//						doWriteUnReadPhoneAndSmsToWatch(0, 0);
+//						return;
+//					} else {
+						doWriteUnReadPhoneAndSmsToWatch(phoneCount, (mmsCount+msmCount));
+//					}
+						
+						
+				}else{
+					Log.e("BaseApp", "__读取短信和电话数量 ： 无变化");
+				}
+				mHander.sendEmptyMessage(0xa1);
+			}
+		};
 		closeDisconnectRemind();
 		mHander.removeCallbacks(remindCloseRunnable);
 		mHander.postDelayed((new Runnable() {
@@ -566,10 +580,10 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 					dialogSyncSetting.dismiss();
 				}
 			}
-		}, 30 * 1000);
+		}, 15 * 1000);
 		
 		mHander.removeCallbacks(taskIncoming);
-		mHander.postDelayed(taskIncoming, 5000);
+		mHander.postDelayed(taskIncoming, 15*1000);
 	}
 
 	@Override
@@ -652,7 +666,7 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 		sendBroadcast(intent);
 	}
 
-	private void bleDataForSleep(int[] sleeps) {
+	private void bleDataForSleep(String sleeps) {
 		Intent intent = new Intent(ACTION_DATA_HISTORY_SLEEP_FOR_TODAY);
 		intent.putExtra(EXTRA_SLEEP, sleeps);
 		sendBroadcast(intent);
@@ -781,11 +795,13 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 		return player;
 	}
 
+	
+	
 	private void doUpdateSetting() {
 		if (dialogSyncSetting == null) {
 			dialogSyncSetting = new ProgressDialog(getApplicationContext());
-			dialogSyncSetting.setCancelable(false);
-			dialogSyncSetting.setMessage("同步手机数据 ...");
+			dialogSyncSetting.setCancelable(true);
+			dialogSyncSetting.setMessage(getApplicationContext().getString(R.string.sync_all_ing));
 			dialogSyncSetting.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			dialogSyncSetting.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
 		}
@@ -795,72 +811,76 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 			dialogSyncSetting.show();
 		}
 		if (isBinded() && getConnectState() == BluetoothProfile.STATE_CONNECTED) {
-			// 第一次进入App 同步数据
-			// 1。同步时间
-			byte[] byteForSyncTime = ProtocolForWrite.instance().getByteForSyncTime(new Date());
-			// 2。同步睡眠开始 结束时间
-			int start = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_SLEEP_START_HOUR, 0);
-			int end = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_SLEEP_END_HOUR, 0);
-			byte[] byteForSleepTime = ProtocolForWrite.instance().getByteForSleepTime(start, end);
-			// 3。最大最小心率
-			int maxHr = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_HEART_RATE_MAX, 240);
-			int minHr = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_HEART_RATE_MIN, 40);
-			byte[] byteForHeartRate = ProtocolForWrite.instance().getByteForHeartRate(maxHr, minHr);
-			// 4。闹钟时间
-			// 获取初始值
-			int hour_1 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_1, 12);
-			int min_1 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_1, 00);
-			int hour_2 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_2, 12);
-			int min_2 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_2, 00);
-			int hour_3 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_3, 12);
-			int min_3 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_3, 00);
-			int hour_4 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_4, 12);
-			int min_4 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_4, 00);
-			int hour_5 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_5, 12);
-			int min_5 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_5, 00);
-			boolean isChecked_1 = (boolean) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_CHECK_BOX_CLOCK_1, false);
-			boolean isChecked_2 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_2, false);
-			boolean isChecked_3 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_3, false);
-			boolean isChecked_4 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_4, false);
-			boolean isChecked_5 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_5, false);
-			byte[] byteForAlarmClock = ProtocolForWrite.instance().getByteForAlarmClock(new int[] { hour_1, min_1, hour_2, min_2, hour_3, min_3, hour_4, min_4, hour_5, min_5 },
-					new boolean[] { isChecked_1, isChecked_2, isChecked_3, isChecked_4, isChecked_5 });
-			// 5。请求今天的睡眠数据
-			byte[] byteForSleepQualityOfToday = ProtocolForWrite.instance().getByteForSleepQualityOfToday(0);
-
-			// byte[] byteForWeather = null;
-			// //7.同步天气 ？
-			// String wieid = (String)
-			// SharedPreferenceUtil.get(getApplicationContext(),
-			// Constant.SHARE_PLACE_WOEID, "");
-			// // if (wieid != null) {
-			// // String weather= (String)
-			// SharedPreferenceUtil.get(getApplicationContext(),
-			// Constant.SHARE_PLACE_WEATHER, "");
-			// // String unit= (String)
-			// SharedPreferenceUtil.get(getApplicationContext(),
-			// Constant.SHARE_PLACE_UNIT, "");
-			// // String temp = (String)
-			// SharedPreferenceUtil.get(getApplicationContext(),
-			// Constant.SHARE_PLACE_TEMP, "");
-			// // byteForWeather =
-			// ProtocolForWrite.instance().getByteForWeather(weather,
-			// unit,temp);
-			// // }
-
-			List<byte[]> values = new ArrayList<>();
-			values.add(byteForSyncTime);
-			values.add(byteForSleepTime);
-			values.add(byteForHeartRate);
-			values.add(byteForAlarmClock);
-			values.add(byteForSleepQualityOfToday);
-			// if (byteForSyncHistoryData != null) {
-			// values.add(byteForSyncHistoryData);
-			// }
-			// if (byteForWeather!=null) {
-			// values.add(byteForWeather);
-			// }
-			writeValueToDevice(values);
+			if (bytes != null) {
+				writeValueToDevice(bytes);
+			}
+			
+//			// 第一次进入App 同步数据
+//			// 1。同步时间
+//			byte[] byteForSyncTime = ProtocolForWrite.instance().getByteForSyncTime(new Date());
+//			// 2。同步睡眠开始 结束时间
+//			int start = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_SLEEP_START_HOUR, 0);
+//			int end = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_SLEEP_END_HOUR, 0);
+//			byte[] byteForSleepTime = ProtocolForWrite.instance().getByteForSleepTime(start, end);
+//			// 3。最大最小心率
+//			int maxHr = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_HEART_RATE_MAX, 240);
+//			int minHr = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_HEART_RATE_MIN, 40);
+//			byte[] byteForHeartRate = ProtocolForWrite.instance().getByteForHeartRate(maxHr, minHr);
+//			// 4。闹钟时间
+//			// 获取初始值
+//			int hour_1 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_1, 12);
+//			int min_1 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_1, 00);
+//			int hour_2 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_2, 12);
+//			int min_2 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_2, 00);
+//			int hour_3 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_3, 12);
+//			int min_3 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_3, 00);
+//			int hour_4 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_4, 12);
+//			int min_4 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_4, 00);
+//			int hour_5 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_5, 12);
+//			int min_5 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_5, 00);
+//			boolean isChecked_1 = (boolean) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_CHECK_BOX_CLOCK_1, false);
+//			boolean isChecked_2 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_2, false);
+//			boolean isChecked_3 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_3, false);
+//			boolean isChecked_4 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_4, false);
+//			boolean isChecked_5 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_5, false);
+//			byte[] byteForAlarmClock = ProtocolForWrite.instance().getByteForAlarmClock(new int[] { hour_1, min_1, hour_2, min_2, hour_3, min_3, hour_4, min_4, hour_5, min_5 },
+//					new boolean[] { isChecked_1, isChecked_2, isChecked_3, isChecked_4, isChecked_5 });
+//			// 5。请求今天的睡眠数据
+//			byte[] byteForSleepQualityOfToday = ProtocolForWrite.instance().getByteForSleepQualityOfToday(0);
+//
+//			// byte[] byteForWeather = null;
+//			// //7.同步天气 ？
+//			// String wieid = (String)
+//			// SharedPreferenceUtil.get(getApplicationContext(),
+//			// Constant.SHARE_PLACE_WOEID, "");
+//			// // if (wieid != null) {
+//			// // String weather= (String)
+//			// SharedPreferenceUtil.get(getApplicationContext(),
+//			// Constant.SHARE_PLACE_WEATHER, "");
+//			// // String unit= (String)
+//			// SharedPreferenceUtil.get(getApplicationContext(),
+//			// Constant.SHARE_PLACE_UNIT, "");
+//			// // String temp = (String)
+//			// SharedPreferenceUtil.get(getApplicationContext(),
+//			// Constant.SHARE_PLACE_TEMP, "");
+//			// // byteForWeather =
+//			// ProtocolForWrite.instance().getByteForWeather(weather,
+//			// unit,temp);
+//			// // }
+//
+//			List<byte[]> values = new ArrayList<>();
+//			values.add(byteForSyncTime);
+//			values.add(byteForSleepTime);
+//			values.add(byteForHeartRate);
+//			values.add(byteForAlarmClock);
+//			values.add(byteForSleepQualityOfToday);
+//			// if (byteForSyncHistoryData != null) {
+//			// values.add(byteForSyncHistoryData);
+//			// }
+//			// if (byteForWeather!=null) {
+//			// values.add(byteForWeather);
+//			// }
+//			writeValueToDevice(values);
 		}
 	}
 	

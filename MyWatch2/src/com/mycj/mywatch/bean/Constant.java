@@ -7,6 +7,7 @@ public class Constant {
 	public final static String SHARE_BINDED_DEVICE_ADDRESS = "share_binded_device_address";
 	public final static String SHARE_CHECK_REMIND_CALL = "share_check_remind_call";
 	public final static String SHARE_CHECK_REMIND = "share_check_remind";
+	public final static String SHARE_LOCALE = "SHARE_LOCALE";
 
 
 	public final static String SHARE_PEDOMETER_TARGET= "share_pedometer_target";

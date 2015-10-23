@@ -35,7 +35,7 @@ public class DeviceBindOtherActivity extends BaseActivity implements OnClickList
 
 	private ProgressDialog progressDialog;
 	private List<BluetoothDevice> listDevices;
-	private int[] rssis = new int[100];
+	private int[] rssis = new int[1000];
 	private MyAdapter mAdapter;
 	private ListView lvDevice;
 	private Vibrator vibrator;
@@ -132,9 +132,9 @@ public class DeviceBindOtherActivity extends BaseActivity implements OnClickList
 
 	@Override
 	protected void onResume() {
-		checkBlue();
 		startAnimation.start();
 		super.onResume();
+		checkBlue();
 	}
 
 	@Override

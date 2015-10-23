@@ -182,8 +182,13 @@ public class HistoryView extends View {
 	}
 
 	private float getYFromData(float data) {
+		//当数值大于12时，显示的值为12。
+		if (data>12) {
+			data=12f;
+		}
 		float value = (float) (data * (mHeight - 2 * spaceY)) / max;// 得到所占的高度
-		return mHeight - 2 * spaceY - value + spaceY; // 得到高度的Y坐标
+		float result = mHeight - 2 * spaceY - value + spaceY;
+		return result; // 得到高度的Y坐标
 	}
 
 	private void drawXY(Canvas canvas) {

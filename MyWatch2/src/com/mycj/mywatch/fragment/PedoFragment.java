@@ -150,7 +150,8 @@ public class PedoFragment extends BaseFragment{
 	}
 	private void setCompleteDistance(int step) {
 		float distance = WatchDataUtil.getDistance(step, getHeight());
-		tvDistance.setText(DataUtil.format((float)distance/(1000*100f))+"");
+		Log.e("", "distance" + distance + " getHeight() : "+ getHeight()  );
+		tvDistance.setText(DataUtil.format((float)distance/(1000f))+"");
 	}
 	private void setCompleteTime(int hour,int min,int second) {
 		String hourStr = String.valueOf(hour);

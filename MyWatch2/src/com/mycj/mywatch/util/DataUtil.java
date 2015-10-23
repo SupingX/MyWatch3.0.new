@@ -234,5 +234,10 @@ public class DataUtil {
 		return df.format(value);
 
 	}
+	public static String format1(float value) {
+		DecimalFormat df = new DecimalFormat("0.0");
+		return df.format(value);
+
+	}
 
 }
