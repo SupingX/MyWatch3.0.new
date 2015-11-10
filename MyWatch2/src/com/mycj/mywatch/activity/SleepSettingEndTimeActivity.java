@@ -52,13 +52,13 @@ public class SleepSettingEndTimeActivity extends BaseActivity implements OnClick
 		hourWV = (WheelView) timepickerview1.findViewById(R.id.hour);
 		hourWV.setAdapter(new NumberWheelAdapter(0, 23));
 		hourWV.setCyclic(true);// 可循环滚动
-		hourWV.setLabel("时");// 文字
+		hourWV.setLabel(getString(R.string.hours));// 文字
 		hourWV.setCurrentItem(0, true);
 		// 设置分钟
 		minWV = (WheelView) timepickerview1.findViewById(R.id.min);
 		minWV.setAdapter(new NumberWheelAdapter(0, 59));
 		minWV.setCyclic(true);// 可循环滚动
-		minWV.setLabel("分");
+		minWV.setLabel(getString(R.string.min));
 		minWV.setCurrentItem(0, true);
 		// 根据屏幕密度来指定选择器字体的大小(不同屏幕可能不同)
 		int textSize = 0;

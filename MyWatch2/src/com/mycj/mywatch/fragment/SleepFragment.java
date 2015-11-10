@@ -68,7 +68,9 @@ public class SleepFragment extends BaseFragment implements OnClickListener{
 						Log.i("", "split :" + split);
 						int [] datas = new int[24];
 						for (int i = 0; i < split.length; i++) {
-							datas[i] = Integer.valueOf(split[i]);
+							if (Integer.valueOf(split[i])!=0) {
+								datas[i] = Integer.valueOf(split[i]);
+							}
 						}
 						sleepCountView.setSleepData(datas);
 						float[] parseSleepData = ParseSleepData.parseSleepData(datas);
@@ -128,7 +130,12 @@ public class SleepFragment extends BaseFragment implements OnClickListener{
 		}else{
 			size = end-start;
 		}
+		if (size==0) {
+			size=1;
+		}
 		tvAwak.setText(DataUtil.format1(size));
+		
+		sleepCountView.setSize(size);
 		
 	}
 	@Override

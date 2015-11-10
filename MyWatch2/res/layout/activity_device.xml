@@ -26,7 +26,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
-                android:background="@drawable/selector_home_bg"
+                android:background="@drawable/selector_back_bg"
                 android:clickable="true" >
 
                 <ImageView
@@ -253,7 +253,8 @@
             />
 
 <RelativeLayout 
-                   
+                
+                android:visibility="gone"   
         android:layout_height="48dp"
         android:layout_width="match_parent"
                 android:clickable="true"
@@ -301,6 +302,7 @@
 
                </RelativeLayout>
               <View 
+                         android:visibility="gone"  
             android:layout_height="0.1px"
             android:layout_width="match_parent"
             android:background="@color/alertdialog_line"

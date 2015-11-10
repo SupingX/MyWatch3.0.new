@@ -26,6 +26,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -56,6 +57,20 @@ public abstract class BaseActivity extends FragmentActivity {
 		}
 		 res.updateConfiguration(config, dm);
 		 SharedPreferenceUtil.put(this,Constant.SHARE_LOCALE , language);
+	}
+	
+	public void startScan(final AbstractSimpleBlueService mSimpleBlueService,Handler mHandler){
+		if (mSimpleBlueService!=null && mSimpleBlueService.isEnable()) {
+			mSimpleBlueService.scanDevice(true);
+			mHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					if (mSimpleBlueService!=null && mSimpleBlueService.isEnable()) {
+					mSimpleBlueService.scanDevice(true);
+					}
+				}
+			}, 2000);
+		}
 	}
 	
 	/**

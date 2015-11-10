@@ -3,7 +3,6 @@ package com.mycj.mywatch.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +12,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.widget.Toast;
+import com.mycj.mywatch.R;
 
 public class ShareUtil {
 	
@@ -32,7 +32,7 @@ public class ShareUtil {
 	    shareIntent.setAction(Intent.ACTION_SEND);  
 	    shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);  
 	    shareIntent.setType("image/jpeg");  
-	    ac.startActivity(Intent.createChooser(shareIntent, "分享运动图片"));
+	    ac.startActivity(Intent.createChooser(shareIntent, ac.getString(R.string.share)));
 	}
 	
 	/** 

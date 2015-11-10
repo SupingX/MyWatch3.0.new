@@ -5,6 +5,7 @@ import com.mycj.mywatch.R;
 import com.mycj.mywatch.business.ProtocolForWrite;
 import com.mycj.mywatch.service.SimpleBlueService;
 import com.mycj.mywatch.service.AbstractSimpleBlueService;
+import com.mycj.mywatch.view.AlertDialog;
 import com.mycj.mywatch.view.RadarView;
 
 import android.app.ProgressDialog;
@@ -95,6 +96,7 @@ public class DeviceSearchDeviceActivity extends BaseActivity implements OnClickL
 	private RelativeLayout rlDevice;
 	private ProgressDialog startDialog;
 	private ProgressDialog exitProgressDialog;
+	private com.mycj.mywatch.view.AlertDialog exitDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -116,8 +118,10 @@ public class DeviceSearchDeviceActivity extends BaseActivity implements OnClickL
 			@Override
 			public void run() {
 				Log.v("DeviceSearchDeviceActivity", "______请求rssi_______");
-				mSimpleBlueService.readRemoteRssi();
-				mHandler.sendEmptyMessage(0);
+				if (mSimpleBlueService!=null) {
+					mSimpleBlueService.readRemoteRssi();
+					mHandler.sendEmptyMessage(0);
+				}
 			}
 		};
 		startDialog = showProgressDialog(getString(R.string.in_searching),false);
@@ -183,7 +187,7 @@ public class DeviceSearchDeviceActivity extends BaseActivity implements OnClickL
 	@Override
 	protected void onStop() {
 		super.onStop();
-		beforeFinish();
+//		beforeFinish();
 		unregisterReceiver(mReceiver);
 
 	
@@ -235,9 +239,8 @@ public class DeviceSearchDeviceActivity extends BaseActivity implements OnClickL
 //				mHandler.removeCallbacks(runRssi);
 //			}
 			
-			
-			beforeFinish();
-	
+			showIOS();
+//			beforeFinish();
 	
 			break;
 
@@ -246,12 +249,31 @@ public class DeviceSearchDeviceActivity extends BaseActivity implements OnClickL
 		}
 	}
 	
-	public void beforeFinish(){
+	public void showIOS(){
+	exitDialog = new com.mycj.mywatch.view.AlertDialog(this).builder()
+				.setMsg(getString(R.string.Exit))
+				.setPositiveButton(getString(R.string.positive), new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						if (mSimpleBlueService!=null&&mSimpleBlueService.isBinded()&&mSimpleBlueService.getConnectState() == BluetoothProfile.STATE_CONNECTED) {
+							mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForAvoidLose(0xA1));
+						}
+						exitDialog.dismiss();
+						finish();
+					}
+				});
+		exitDialog.show();
+	}
+	
+	private void beforeFinish(){
 		if (exitProgressDialog==null) {
 			exitProgressDialog = showProgressDialog(getResources().getString(R.string.stop_searching),true);
 		}else{
 			exitProgressDialog.show();
 		}
+		
+		
 		if (mSimpleBlueService!=null&&mSimpleBlueService.isBinded()&&mSimpleBlueService.getConnectState() == BluetoothProfile.STATE_CONNECTED) {
 			mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForAvoidLose(0xA1));
 //			if (exitProgressDialog!=null && !exitProgressDialog.isShowing()) {
@@ -280,6 +302,7 @@ public class DeviceSearchDeviceActivity extends BaseActivity implements OnClickL
 //		});
 //		beforeFinish();
 //		super.onBackPressed();
+		showIOS();
 	}
 	
 }

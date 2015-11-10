@@ -190,8 +190,11 @@ public class ProtocolForNotify extends AbstractProtocolForNotify {
 
 			int hr = Integer.parseInt(hrStr, 16);
 			int avghr = Integer.parseInt(avgStr, 16);
-			int maxHr = Integer.parseInt(minStr, 16);
-			int minHr = Integer.parseInt(maxStr, 16);
+			int  minHr= Integer.parseInt(minStr, 16);
+			int maxHr = Integer.parseInt(maxStr, 16);
+			Log.e("", "======"+avghr+"=======");
+			Log.e("", "======"+maxHr+"=======");
+			Log.e("", "======"+minHr+"=======");
 			hrData = new HeartRateData(hr, avghr, maxHr, minHr);
 			logV(hrData.toString());
 		} else {

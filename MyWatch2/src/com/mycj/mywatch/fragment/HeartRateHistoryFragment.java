@@ -46,7 +46,7 @@ public class HeartRateHistoryFragment extends BaseFragment implements OnClickLis
 			}
 		};
 	};
-	private AbstractSimpleBlueService mSimpleBlueService;
+//	private AbstractSimpleBlueService mSimpleBlueService;
 	private TextView tvDate;
 	private TextView tvPreious;
 	private TextView tvNext;
@@ -64,9 +64,15 @@ public class HeartRateHistoryFragment extends BaseFragment implements OnClickLis
 	@Override
 	public void onStart() {
 		super.onStart();
-		mSimpleBlueService = getSimpleBlueService();
+//		mSimpleBlueService = getSimpleBlueService();
 	}
 	
+	
+	public void delete(){
+		DataSupport.deleteAll(HeartRateData.class);
+		
+		
+	}
 	@Override
 	public void onResume() {
 		

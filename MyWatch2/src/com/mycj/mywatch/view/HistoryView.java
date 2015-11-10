@@ -26,7 +26,7 @@ public class HistoryView extends View {
 	private float spaceY = 40;
 	private float mWidth;
 	private float mHeight;
-	private float max = 6;
+	private float max = 12;
 	public void setMax(float max){
 		this.max = max;
 	}
@@ -102,7 +102,8 @@ public class HistoryView extends View {
 		mPaintPath.setStrokeWidth(4);
 		mPaintPath.setStrokeCap(Paint.Cap.ROUND); // 设置圆角
 
-		
+//		this.data.add(2222f);
+//		this.data.add(4555f);
 		//
 //		for (int i = 0; i < 31; i++) {
 //			data.add((float)new Random().nextInt(6));
@@ -183,8 +184,8 @@ public class HistoryView extends View {
 
 	private float getYFromData(float data) {
 		//当数值大于12时，显示的值为12。
-		if (data>12) {
-			data=12f;
+		if (data>max) {
+			data=max;
 		}
 		float value = (float) (data * (mHeight - 2 * spaceY)) / max;// 得到所占的高度
 		float result = mHeight - 2 * spaceY - value + spaceY;

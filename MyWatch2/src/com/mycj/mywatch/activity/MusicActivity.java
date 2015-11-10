@@ -158,12 +158,19 @@ public class MusicActivity extends BaseActivity implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.img_music_next:
+			if (musicSerivce!=null) {
+				
+		
 			musicSerivce.playDown();
 			setCurrentMusicBackground(musicSerivce.getPlayingPosition());
+			}
 			break;
 		case R.id.img_music_start_or_stop:
 			
 			Log.e("musicSerivce.isPlaying()", "musicSerivce.isPlaying() :" +musicSerivce.isPlaying());
+			if (musicSerivce!=null) {
+				
+		
 			if (musicSerivce.isPlaying()) {
 //				musicSerivce.stop();
 				musicSerivce.pause();
@@ -186,11 +193,15 @@ public class MusicActivity extends BaseActivity implements OnClickListener {
 				}
 			}
 			setCurrentMusicBackground(musicSerivce.getPlayingPosition());
-		
+			}
 			break;
 		case R.id.img_music_preious:
+			if (musicSerivce!=null) {
+				
+		
 			musicSerivce.playUp();
 			setCurrentMusicBackground(musicSerivce.getPlayingPosition());
+			}
 			break;
 		case R.id.rl_more:
 			finish();
@@ -210,7 +221,11 @@ public class MusicActivity extends BaseActivity implements OnClickListener {
 		rlMore = (RelativeLayout) findViewById(R.id.rl_more);
 		listViewMusic = (ListView) findViewById(R.id.lv_msc);
 //		initMusic();
-		listMusics =musicSerivce.getMusicList();
+		if (musicSerivce!=null) {
+			listMusics =musicSerivce.getMusicList();
+		}else{
+			listMusics = new ArrayList<Music>();
+		}
 		musicAdapter2 = new MusicListAdapter2(this, listMusics);
 		listViewMusic.setAdapter(musicAdapter2);
 	}
@@ -224,17 +239,21 @@ public class MusicActivity extends BaseActivity implements OnClickListener {
 		listViewMusic.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//				int index = listViewMusic.getFirstVisiblePosition()+position;
+					if (listMusics!=null) {
+				int index = listViewMusic.getFirstVisiblePosition()+position;
 				Music music = listMusics.get(position);
 				long musicID = music.getId();
 				Uri uri = MusicLoader.getMusicUriById(musicID);
 				Log.d("", "uri : " + uri);
+			
+					
+			
 				musicSerivce.play(uri);
 				musicSerivce.setPlayingPosition(position);
 //				setCurrentMusicBackground(position);
 				setMusicButtonStartOrStop(musicSerivce.isPlaying());
 				musicAdapter2.setSelect(position);
-				
+			}
 			}
 		});
 	}
@@ -261,7 +280,11 @@ public class MusicActivity extends BaseActivity implements OnClickListener {
 //				view.setBackgroundColor(getResources().getColor(R.color.grey_light));
 //			}
 //		}
+		if (musicSerivce!=null) {
+			
+	
 		musicAdapter2.setSelect(musicSerivce.getPlayingPosition());
+		}
 	}
 
 	private void initMusic() {

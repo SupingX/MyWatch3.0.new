@@ -26,6 +26,7 @@ import com.mycj.mywatch.activity.WeatherActivity;
 import com.mycj.mywatch.bean.CodeDB;
 import com.mycj.mywatch.bean.ConditionWeather;
 import com.mycj.mywatch.bean.Constant;
+import com.mycj.mywatch.bean.HeartRateData;
 import com.mycj.mywatch.bean.PedoData;
 import com.mycj.mywatch.bean.SleepData;
 import com.mycj.mywatch.business.LoadWeatherJsonTask;
@@ -373,9 +374,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 							unitInt = 0x80;
 						}
 					}
-
+					
 					if (null != mSimpleBlueService && mSimpleBlueService.isBinded() && mSimpleBlueService.getConnectState() == BluetoothProfile.STATE_CONNECTED) {
-						mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForWeather(weatherCode.getProtol(), unitInt, tempInt));
+						mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForWeather(weatherCode.getProtol(), unitInt, Math.abs(tempInt)));
 					}
 
 				} catch (JSONException e) {
@@ -400,6 +401,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 	private AbstractSimpleBlueService mSimpleBlueService;
 	private SoundPlay play;
 
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -410,23 +413,24 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 		// StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects().detectLeakedClosableObjects().penaltyLog().penaltyDeath().build());
 		initViews();
 		setListener();
+		
 		// mHandler.postDelayed(taskState,2000);
 		
-		Bundle b = getIntent().getExtras();
-		if (b!=null) {
-			byte[] byteForSyncTime = b.getByteArray("byteForSyncTime");
-			byte[] byteForSleepTime = b.getByteArray("byteForSleepTime");
-			byte[] byteForHeartRate = b.getByteArray("byteForHeartRate");
-			byte[] byteForAlarmClock = b.getByteArray("byteForAlarmClock");
-			byte[] byteForSleepQualityOfToday = b.getByteArray("byteForSleepQualityOfToday");
-			
-			values = new ArrayList<>();
-			values.add(byteForSyncTime);
-			values.add(byteForSleepTime);
-			values.add(byteForHeartRate);
-			values.add(byteForAlarmClock);
-			values.add(byteForSleepQualityOfToday);
-		}
+//		Bundle b = getIntent().getExtras();
+//		if (b!=null) {
+//			byte[] byteForSyncTime = b.getByteArray("byteForSyncTime");
+//			byte[] byteForSleepTime = b.getByteArray("byteForSleepTime");
+//			byte[] byteForHeartRate = b.getByteArray("byteForHeartRate");
+//			byte[] byteForAlarmClock = b.getByteArray("byteForAlarmClock");
+//			byte[] byteForSleepQualityOfToday = b.getByteArray("byteForSleepQualityOfToday");
+//			
+//			values = new ArrayList<>();
+//			values.add(byteForSyncTime);
+//			values.add(byteForSleepTime);
+//			values.add(byteForHeartRate);
+//			values.add(byteForAlarmClock);
+//			values.add(byteForSleepQualityOfToday);
+//		}
 		
 	}
 
@@ -444,18 +448,44 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 			}
 		};
 		mSimpleBlueService = getSimpleBlueService();
-		mSimpleBlueService.setBytes(values);
 		Log.e("", "mSimpleBlueService : " + mSimpleBlueService);
-		registerReceiver(mReceiver, SimpleBlueService.getIntentFilter());
+		if (mSimpleBlueService!=null) {
+			registerReceiver(mReceiver, SimpleBlueService.getIntentFilter());
+		}
 
 	}
 
+	private void startScan(){
+		if (mSimpleBlueService!=null && mSimpleBlueService.isEnable()) {
+			mSimpleBlueService.scanDevice(true);
+			mHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					if (mSimpleBlueService!=null && mSimpleBlueService.isEnable()) {
+					mSimpleBlueService.scanDevice(true);
+					}
+				}
+			}, 2000);
+		}
+	}
+	
 	@Override
 	protected void onResume() {
 		isIncameraing = false;
+//		startScan();
+		startScan(mSimpleBlueService, mHandler);
+//		mHandler.postDelayed(new Runnable() {
+//			@Override
+//			public void run() {
+//				if (mSimpleBlueService!=null && mSimpleBlueService.isEnable()) {
+//					mSimpleBlueService.scanDevice(true);
+//				}else{
+//					Log.e("", "----------mSimpleBlueServi为空-------");
+//				}
+//			}
+//		}, 1000);
 		
-		// soundPool.play(soundPoolMap.get(1), 1, 1, 0, 3, 1);
-		checkBlue();
+//		checkBlue();
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -464,9 +494,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 		});
 		if (null != mSimpleBlueService && mSimpleBlueService.getConnectState() == BluetoothProfile.STATE_CONNECTED) {
 			mSimpleBlueService.readRemoteRssi();
-		
 		}
-
 		setClockTime();
 		super.onResume();
 	}
@@ -476,7 +504,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 		super.onStop();
 
 	}
-
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent arg2) {
 		switch (requestCode) {
@@ -690,6 +724,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 
 	private boolean isOnceEnter = true;
 	private List<byte[]> values;
+	
+	//F20140FFFFFFFF
 
 	/**
 	 * 检查蓝牙
@@ -822,8 +858,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 	public void onBackPressed() {
 //		chooseLau("zh");
 		ActionSheetDialog exitDialog = new ActionSheetDialog(this).builder();
-		exitDialog.setTitle("退出程序？");
-		exitDialog.addSheetItem("确定", SheetItemColor.Red, new OnSheetItemClickListener() {
+		exitDialog.setTitle(getString(R.string.exit_app));
+		exitDialog.addSheetItem(getString(R.string.positive), SheetItemColor.Red, new OnSheetItemClickListener() {
 			@Override
 			public void onClick(int which) {
 				mSimpleBlueService.close();
@@ -851,9 +887,22 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnPro
 //			}
 //		}
 //		mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForHeartRate(44, 244));
+		
+//		HeartRateData data1 = new HeartRateData("2013", "05", "13", "23", "15", "12,33,445,54,565,45");
+//		HeartRateData data2 = new HeartRateData("2012", "05", "13", "22", "15", "122,33,445,54,53,45");
+//		HeartRateData data3 = new HeartRateData("2011", "05", "13", "21", "15", "1245,33,445,54,565,45");
+//		HeartRateData data4 = new HeartRateData("2013", "05", "13", "20", "15", "121,334,445,54,565,45");
+//		HeartRateData data5 = new HeartRateData("2015", "03", "13", "19", "15", "12,333,445,554,56335,45");
+//		HeartRateData data6 = new HeartRateData("2016", "02", "13", "18", "15", "12,33,44522,54,5615,45");
+//		data1.save();
+//		data2.save();
+//		data3.save();
+//		data4.save();
+//		data5.save();
+//		data6.save();
 
 	}
-
+	
 	/**
 	 * 根据日期查找stepData
 	 * 

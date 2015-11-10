@@ -45,7 +45,6 @@ public class BaseApp extends Application  {
 	private AbstractSimpleBlueService mSimpleBlueService;
 	public static final String TAG = "ImiChatSMSReceiver";
 	public static final String SMS_RECEIVED_ACTION = "android.provider.Telephony.SMS_RECEIVED";
-	private BluetoothStateBroadcastReceiver bluetoothStateBroadcastReceiver;
 	/**
 	 * 音乐服务通信
 	 */
@@ -77,17 +76,17 @@ public class BaseApp extends Application  {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			mSimpleBlueService = ((AbstractSimpleBlueService.MyBinder) service).getService();
-			bluetoothStateBroadcastReceiver = new BluetoothStateBroadcastReceiver(getApplicationContext(), mSimpleBlueService);
-			registerBoradcastReceiverForCheckBlueToothState(bluetoothStateBroadcastReceiver);
-			
-			if (!mSimpleBlueService.isEnable()) {
-					Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-					enableBtIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					startActivity(enableBtIntent);
-				// showIosDialog();
-			}else{
-				mSimpleBlueService.scanDevice(true);
-			}
+//			bluetoothStateBroadcastReceiver = new BluetoothStateBroadcastReceiver(getApplicationContext(), mSimpleBlueService);
+//			registerBoradcastReceiverForCheckBlueToothState(bluetoothStateBroadcastReceiver);
+//			
+//			if (!mSimpleBlueService.isEnable()) {
+//					Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//					enableBtIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//					startActivity(enableBtIntent);
+//				// showIosDialog();
+//			}else{
+//				mSimpleBlueService.scanDevice(true);
+//			}
 		}
 	};
 
@@ -369,9 +368,9 @@ public class BaseApp extends Application  {
 		mSimpleBlueService.close();
 //		mHandle.removeCallbacks(taskIncoming);
 		unbindService(musicConnection);
-		mMusicService.stopSelf();
+//		mMusicService.stopSelf();
 		unbindService(blueConnection);
-		mSimpleBlueService.stopSelf();
+//		mSimpleBlueService.stopSelf();
 		super.onTerminate();
 	}
 
@@ -453,19 +452,7 @@ public class BaseApp extends Application  {
 	// }
 	// }
 
-	/**
-	 * 监听蓝牙变化情况
-	 */
-	private void registerBoradcastReceiverForCheckBlueToothState(BroadcastReceiver stateChangeReceiver) {
-		IntentFilter stateChangeFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-		IntentFilter connectedFilter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
-		IntentFilter disConnectedFilter = new IntentFilter(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-		IntentFilter stateFilter = new IntentFilter(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
-		registerReceiver(stateChangeReceiver, stateChangeFilter);
-		registerReceiver(stateChangeReceiver, connectedFilter);
-		registerReceiver(stateChangeReceiver, disConnectedFilter);
-		registerReceiver(stateChangeReceiver, stateFilter);
-	}
+
 
 
 }

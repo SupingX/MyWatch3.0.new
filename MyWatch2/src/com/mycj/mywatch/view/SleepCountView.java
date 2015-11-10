@@ -29,7 +29,7 @@ public class SleepCountView extends View {
 	private int[] sleeps = new int[] {};
 	private float spaceY = 50;
 	private float perWidth;
-	private int size;
+	private int size=1;
 
 	public int getSize() {
 		return this.size;
@@ -43,8 +43,8 @@ public class SleepCountView extends View {
 	private Paint textPaint;
 
 	private float downX;
-	private int start;
-	private int end;
+	private int startText;
+	private int endText;
 
 	private OnScrollListener mOnScrollListener;
 	private OnSleepDataChangeListener mOnSleepDataChangeListener;
@@ -85,16 +85,17 @@ public class SleepCountView extends View {
 //		this.awakTime = 0;
 //		deep = 0;
 //		light = 0;
-		if (sleeps == null) {
-			Log.v("", "sleeps为空");
-			this.sleeps = null;
-			this.sleeps = new int[size];
-
-		} else {
+//		if (sleeps == null) {
+//			Log.v("", "sleeps为空");
+//			this.sleeps = null;
+//			this.sleeps = new int[size];
+//
+//		} else {
 			this.sleeps = sleeps;
-//			parseSleepData(this.sleeps);
-			size = sleeps.length;
-		}
+			
+////			parseSleepData(this.sleeps);
+//			size = sleeps.length;
+//		}
 
 		invalidate();
 		if (mOnSleepDataChangeListener != null) {
@@ -178,13 +179,13 @@ public class SleepCountView extends View {
 		textPaint.setStrokeJoin(Paint.Join.ROUND);
 		textPaint.setStrokeCap(Paint.Cap.ROUND); // 设置圆角
 
-		start = (int) SharedPreferenceUtil.get(context, Constant.SHARE_SLEEP_START_HOUR, 0);
-		end = (int) SharedPreferenceUtil.get(context, Constant.SHARE_SLEEP_END_HOUR, 23);
+		startText = (int) SharedPreferenceUtil.get(context, Constant.SHARE_SLEEP_START_HOUR, 0);
+		endText = (int) SharedPreferenceUtil.get(context, Constant.SHARE_SLEEP_END_HOUR, 23);
 //		size = Math.abs(end - start);
-		if (end<start) {
-			size = 24-start+end;
+		if (endText<startText) {
+			size = 24-startText+endText;
 		}else{
-			size = end-start ;
+			size = endText-startText ;
 		}
 		if (size == 0) {
 			size = 1;
@@ -195,6 +196,11 @@ public class SleepCountView extends View {
 		colorAwake = getResources().getColor(R.color.color_awak);
 	}
 
+	public void setSize(int size){
+		this.size =size;
+		invalidate();
+	}
+	
 	private int measureHeight(int heightMeasureSpec) {
 		int result = 0;
 		int mode = MeasureSpec.getMode(heightMeasureSpec);
@@ -224,11 +230,10 @@ public class SleepCountView extends View {
 	private void drawRects(Canvas canvas) {
 
 		if (sleeps.length > 0) {
-
 			for (int i = 0; i < size; i++) {
 				// sleepData.getSleep();//
 				// 得到数据。数据说明：0x00-没有数据，0x01-非常差，0x02-差，0x03-中，0x04-好，0x05-非常好
-				float value = getSleepValue(sleeps[i]);// 根据睡眠的值睡眠时间
+					float value = getSleepValue(sleeps[i]);// 根据睡眠的值睡眠时间
 				// 方块
 				float left = perWidth * i;
 				float top = getRectTop(value);
@@ -237,18 +242,18 @@ public class SleepCountView extends View {
 				RectF rectF = new RectF(left, top, right, bottom);
 				canvas.drawRect(rectF, rectPaint);// 画方块
 
-				if (i == 0) {
-					String hourStr = getHourString(start);
-					Rect rectText = new Rect();
-					textPaint.getTextBounds(hourStr, 0, hourStr.length(), rectText);
-					canvas.drawText(hourStr, 0, getHeight() - spaceY / 2, textPaint);
-				} else if (i == size - 1) {
-					String hourStr = getHourString(end);
-					Rect rectText = new Rect();
-					textPaint.getTextBounds(hourStr, 0, hourStr.length(), rectText);
-					canvas.drawText(hourStr, (size) * perWidth - rectText.width(), getHeight() - spaceY / 2, textPaint);
+//				if (i == 0) {
+					String hourStartStr = getHourString(startText);
+					Rect rectTextStart = new Rect();
+					textPaint.getTextBounds(hourStartStr, 0, hourStartStr.length(), rectTextStart);
+					canvas.drawText(hourStartStr, 0, getHeight() - spaceY / 2, textPaint);
+//				} else if (i == size - 1) {
+					String hourStrEnd = getHourString(endText);
+					Rect rectTextEnd = new Rect();
+					textPaint.getTextBounds(hourStrEnd, 0, hourStrEnd.length(), rectTextEnd);
+					canvas.drawText(hourStrEnd, (size) * perWidth - rectTextEnd.width(), getHeight() - spaceY / 2, textPaint);
+//				}
 				}
-			}
 		} else {
 			float left = 0;
 			float top = spaceY;
@@ -258,12 +263,11 @@ public class SleepCountView extends View {
 			rectPaint.setColor(colorAwake);
 			canvas.drawRect(rectF, rectPaint);// 画方块
 
-			String hourStrStart = getHourString(start);
+			String hourStrStart = getHourString(startText);
 			Rect rectTextStart = new Rect();
 			textPaint.getTextBounds(hourStrStart, 0, hourStrStart.length(), rectTextStart);
 			canvas.drawText(hourStrStart, 0, getHeight() - spaceY / 2, textPaint);
-
-			String hourStrEnd = getHourString(end);
+			String hourStrEnd = getHourString(endText);
 			Rect rectTextEnd = new Rect();
 			textPaint.getTextBounds(hourStrEnd, 0, hourStrEnd.length(), rectTextEnd);
 			canvas.drawText(hourStrEnd, (size) * perWidth - rectTextEnd.width(), getHeight() - spaceY / 2, textPaint);
@@ -350,7 +354,7 @@ public class SleepCountView extends View {
 		// 得到数据。数据说明：0x00-没有数据，0x01-非常差，0x02-差，0x03-中，0x04-好，0x05-非常好
 		Log.v("", "sleep:" + sleep);
 		float result = 0;
-
+		rectPaint.setColor(colorAwake);
 		switch (sleep) {
 		case 0:
 			rectPaint.setColor(colorAwake);

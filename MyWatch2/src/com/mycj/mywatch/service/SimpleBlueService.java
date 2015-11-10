@@ -2,6 +2,7 @@ package com.mycj.mywatch.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.text.style.SuperscriptSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,6 +34,7 @@ import com.mycj.mywatch.bean.Constant;
 import com.mycj.mywatch.bean.HeartRateData;
 import com.mycj.mywatch.bean.SleepData;
 import com.mycj.mywatch.bean.PedoData;
+import com.mycj.mywatch.business.HeartRateJson;
 import com.mycj.mywatch.business.ProtocolForNotify;
 import com.mycj.mywatch.business.ProtocolForWrite;
 import com.mycj.mywatch.util.DateUtil;
@@ -100,17 +103,115 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 				}
 			}
 		}, 2000);
+
+		taskIncoming = new Runnable() {
+			@Override
+			public void run() {
+				int mmsCount = MessageUtil.getNewMmsCount(getApplicationContext());
+				int msmCount = MessageUtil.getNewSmsCount(getApplicationContext());
+				int phoneCount = MessageUtil.readMissCall(getApplicationContext());
+				Log.e("BaseApp", "____电话数量 ： " + phoneNo + "-->" + phoneCount);
+				Log.e("BaseApp", "____短信 ： " + smsMNo + "-->" + (msmCount + mmsCount) + (smsMNo != (mmsCount + msmCount)));
+				// 数量只要有一个变化就发送
+				boolean isCallRemind;
+				isCallRemind = (boolean) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_CHECK_REMIND_CALL, false);
+				if (isCallRemind) {
+				if (phoneNo != phoneCount || smsMNo != (mmsCount + msmCount)) {
+					Log.e("BaseApp", "_______________________________________________________________________________________读取短信和电话数量 ： 有变化");
+					// if (mmsCount == 0 && msmCount == 0 && phoneCount == 0) {
+					// doWriteUnReadPhoneAndSmsToWatch(0, 0);
+					// return;
+					// } else {
+					doWriteUnReadPhoneAndSmsToWatch(phoneCount, (mmsCount + msmCount));
+					// }
+					
+					//修改与10.28
+					phoneNo = phoneCount;
+					smsMNo = (mmsCount + msmCount);
+					
+					
+					
+					
+				} else {
+					Log.e("BaseApp", "__读取短信和电话数量 ： 无变化");
+				}
+				}
+				mHander.sendEmptyMessage(0xa1);
+			}
+		};
 		
-	
+		mHander.postDelayed(taskIncoming, 8 * 1000);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		oncePlayMusic = false;
+		hrList.clear();
+		hrList=null;
 		if (dialogSyncSetting != null && dialogSyncSetting.isShowing()) {
 			dialogSyncSetting.dismiss();
 		}
+	}
+
+	/**
+	 * 保存心率数据json最后一次
+	 * 
+	 * @param hrd
+	 */
+	private void saveHeartRateJson(HeartRateData hrd) {
+		String json = HeartRateJson.objToJson(hrd);
+		HeartRateJson.writeFileData("json", json, getApplicationContext());
+	}
+
+	/**
+	 * 保存心率
+	 */
+	private void saveHeartRate(List<Integer> hrList) {
+		
+		String datas = dataToString(hrList);
+		int maxs=0;
+		int mins= 0;
+		int total = 0;
+		int size = hrList.size();
+		if (size > 0) {
+			maxs = hrList.get(0);
+			mins = hrList.get(0);
+			for (int i = 0; i < size; i++) {
+				int hr = hrList.get(i);
+				maxs = Math.max(maxs, hr);
+				mins = Math.min(mins, hr);
+				total+=hr;
+			}
+		}
+		int avgs = (int) (total*1.0 /size);
+		
+		Date date = new Date();
+		Calendar c = Calendar.getInstance();
+		c.clear();
+		c.setTime(date);
+		String year = String.valueOf(c.get(Calendar.YEAR));
+		String month = String.valueOf(c.get(Calendar.MONTH) + 1);
+		String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
+		String hour = String.valueOf(c.get(Calendar.HOUR_OF_DAY));
+		String min = String.valueOf(c.get(Calendar.MINUTE));
+
+		List<HeartRateData> heartRateDatas = DataSupport.where("year=? and month=? and day=? and hour =? and min=?", year, month, day, hour, min).find(HeartRateData.class);
+		if (heartRateDatas != null && heartRateDatas.size() > 0) {
+		} else {
+			// 说明数据库不存在
+			Log.v("", "存在没有数据");
+			if (datas != null && !datas.equals("")) {
+				HeartRateData hrd = new HeartRateData(year, month, day, hour, min, datas);
+				hrd.setMaxHr(maxs);
+				hrd.setMinHr(mins);
+				hrd.setAvghr(avgs);
+				hrd.save();
+				Log.v("", "保存心率成功 ：" + hrd.toString());
+				saveHeartRateJson(hrd);
+			}
+		}
+
 	}
 
 	@Override
@@ -137,9 +238,9 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 							// findPhonePlay.release();
 							// findPhonePlay = null;
 							// }
-							if (musicService!=null) {
+							if (musicService != null) {
 								musicService.stop();
-								musicService.play(R.raw.crystal,true);
+								musicService.play(R.raw.crystal, true);
 							}
 							// findPhonePlay = ring(R.raw.crystal);
 							// showdialog(getResources().getString(R.string.find_phone));
@@ -156,7 +257,7 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 					// findPhonePlay.release();
 					// findPhonePlay = null;
 					// }
-					if (musicService!=null) {
+					if (musicService != null) {
 						musicService.stop();
 					}
 					// if (disconnectDiloag != null) {
@@ -221,10 +322,10 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 			switch (notifyForMusic) {
 			case 0x0108:// 播放
 				Log.e("LiteBlueService", " 播放");
-				if (musicService!=null&&musicService.getPlayingPosition() == -1) {
+				if (musicService != null && musicService.getPlayingPosition() == -1) {
 					musicService.setPlayingPosition(0);
 				}
-				if (musicService!=null &&musicService.getCurrentPostion() == 0) {
+				if (musicService != null && musicService.getCurrentPostion() == 0) {
 					Log.e("LiteBlueService", " 播放 : playByCurrentPlayingPosition()");
 					musicService.playByCurrentPlayingPosition();
 				} else {
@@ -235,7 +336,7 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 				break;
 			case 0x0109:// 停止
 				Log.e("LiteBlueService", " 停止");
-				if (musicService!=null) {
+				if (musicService != null) {
 					musicService.pause();
 				}
 				break;
@@ -291,7 +392,31 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 			HeartRateData hrData = notify.notifyForHeartRateData(data);
 			if (hrData != null) {
 				int hr = hrData.getHr();
+				int maxHr = hrData.getMaxHr();
+				int minHr = hrData.getMinHr();
+				int avgHr = hrData.getAvghr();
+				
+				
 				bleDataForHeartRate(hr);
+
+				//第一次进去,判断心率是否大于0
+				if (hr > 0) {
+					isStart= true;
+				}
+				if (hr == 0) {
+					isStart = false;
+				}
+				
+				//判断是否开启
+				if (isStart) {
+					hrList.add(hr);
+				}else{
+		
+					saveHeartRate(hrList);
+					hrList.clear();
+				}
+					
+					
 				// int max = (int)
 				// SharedPreferenceUtil.get(getApplicationContext(),
 				// Constant.SHARE_HEART_RATE_MAX, 0);
@@ -324,31 +449,31 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 			break;
 		case ProtocolForNotify.NOTIFY_HISTORY_HEART_RATE:
 			// 历史数据 -- 心率
-			final HeartRateData heartRateData = notify.notifyForHistoryDataToHearRateData(data);
-			if (heartRateData != null) {
-				Log.v("LiteBlueService", "保存心率数据");
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						String year = heartRateData.getYear();
-						String month = heartRateData.getMonth();
-						String day = heartRateData.getDay();
-						List<HeartRateData> heartRateDatas = DataSupport.where("year=? and month=? and day=?", year, month, day).find(HeartRateData.class);
-						// 说明数据库存在
-						if (heartRateDatas != null && heartRateDatas.size() > 0) {
-							Log.v("LiteBlueService", "存在历史数据");
-							HeartRateData heartRateDataQuery = heartRateDatas.get(0);
-							heartRateDataQuery.setHr(heartRateData.getHr());
-							heartRateDataQuery.setAvghr(heartRateData.getAvghr());
-							heartRateDataQuery.setMaxHr(heartRateData.getMaxHr());
-							heartRateDataQuery.setMinHr(heartRateData.getMinHr());
-							heartRateDataQuery.save();
-						} else {
-							heartRateData.save();
-						}
-					}
-				}).start();
-			}
+//			final HeartRateData heartRateData = notify.notifyForHistoryDataToHearRateData(data);
+//			if (heartRateData != null) {
+//				Log.v("LiteBlueService", "保存心率数据");
+//				new Thread(new Runnable() {
+//					@Override
+//					public void run() {
+//						String year = heartRateData.getYear();
+//						String month = heartRateData.getMonth();
+//						String day = heartRateData.getDay();
+//						List<HeartRateData> heartRateDatas = DataSupport.where("year=? and month=? and day=?", year, month, day).find(HeartRateData.class);
+//						// 说明数据库存在
+//						if (heartRateDatas != null && heartRateDatas.size() > 0) {
+//							Log.v("LiteBlueService", "存在历史数据");
+//							HeartRateData heartRateDataQuery = heartRateDatas.get(0);
+//							heartRateDataQuery.setHr(heartRateData.getHr());
+//							heartRateDataQuery.setAvghr(heartRateData.getAvghr());
+//							heartRateDataQuery.setMaxHr(heartRateData.getMaxHr());
+//							heartRateDataQuery.setMinHr(heartRateData.getMinHr());
+//							heartRateDataQuery.save();
+//						} else {
+//							heartRateData.save();
+//						}
+//					}
+//				}).start();
+//			}
 
 			break;
 		case ProtocolForNotify.NOTIFY_HISTORY_STEP:
@@ -388,10 +513,10 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 						String day = notifyForHistoryDataToSleepData.getDay();
 						Log.e("day", "day : " + day);
 						List<SleepData> sleepDatas = DataSupport.where("year=? and month=? and day=?", year, month, day).find(SleepData.class);
-						if (sleepDatas!=null && sleepDatas.size()>0) {
+						if (sleepDatas != null && sleepDatas.size() > 0) {
 							sleepDatas.get(0).setSdatas(notifyForHistoryDataToSleepData.getSdatas());
 							sleepDatas.get(0).save();
-						}else{
+						} else {
 							notifyForHistoryDataToSleepData.save();
 						}
 					}
@@ -485,87 +610,62 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 		}
 	}
 
-	
 	@Override
 	public void onReconnectedOverTimeOut() {
-		if (null != dialogSyncSetting && dialogSyncSetting.isShowing()) {
-			dialogSyncSetting.dismiss();
-		}
-		// if (isOnce) {
-
-		mHander.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				// if (findPhonePlay != null) {
-				// findPhonePlay.stop();
-				// findPhonePlay.release();
-				// findPhonePlay = null;
-				// }
-				// if (player != null && player.isPlaying()) {
-				// player.stop();
-				// player.release();
-				// player = null;
-				// }
-				// if (player != null && player.isPlaying()) {
-				// player.stop();
-				// player.release();
-				// player = null;
-				// }
-				// ring(R.raw.crystal);
-				showdialog(getResources().getString(R.string.device_is_not_connected));
-				if (musicService != null ) {
-					Log.e("", "短线了，关闭音乐");
-					musicService.stop();
-				}
-				// isOnce = false;
-				musicService.play(R.raw.jump,true);
-			}
-		}, 100);
+		// if (null != dialogSyncSetting && dialogSyncSetting.isShowing()) {
+		// dialogSyncSetting.dismiss();
 		// }
-		
-		mHander.postDelayed(remindCloseRunnable, 10*1000);
+		// // if (isOnce) {
+		//
+		// mHander.postDelayed(new Runnable() {
+		// @Override
+		// public void run() {
+		// // if (findPhonePlay != null) {
+		// // findPhonePlay.stop();
+		// // findPhonePlay.release();
+		// // findPhonePlay = null;
+		// // }
+		// // if (player != null && player.isPlaying()) {
+		// // player.stop();
+		// // player.release();
+		// // player = null;
+		// // }
+		// // if (player != null && player.isPlaying()) {
+		// // player.stop();
+		// // player.release();
+		// // player = null;
+		// // }
+		// // ring(R.raw.crystal);
+		// showdialog(getResources().getString(R.string.device_is_not_connected));
+		// if (musicService != null ) {
+		// Log.e("", "短线了，关闭音乐");
+		// musicService.stop();
+		// }
+		// // isOnce = false;
+		// musicService.play(R.raw.jump,true);
+		// }
+		// }, 100);
+		// // }
+		//
+		// mHander.postDelayed(remindCloseRunnable, 10*1000);
 	}
-	
-	/**
-	 * 关闭断线声音提示
-	 */
-	private Runnable remindCloseRunnable = new Runnable() {
-		@Override
-		public void run() {
-			if (musicService!=null) {
-				musicService.stop();
-			}
-		}
-	};
+
+	// /**
+	// * 关闭断线声音提示
+	// */
+	// private Runnable remindCloseRunnable = new Runnable() {
+	// @Override
+	// public void run() {
+	// if (musicService!=null) {
+	// musicService.stop();
+	// }
+	// }
+	// };
 	@Override
 	public void onServicediscoveredSuccess() {
-		taskIncoming = new Runnable() {
-			@Override
-			public void run() {
-				int mmsCount = MessageUtil.getNewMmsCount(getApplicationContext());
-				int msmCount = MessageUtil.getNewSmsCount(getApplicationContext());
-				int phoneCount = MessageUtil.readMissCall(getApplicationContext());
-				Log.e("BaseApp", "____电话数量 ： "+phoneNo +"-->"+phoneCount);
-				Log.e("BaseApp", "____短信 ： " + smsMNo+"-->"+(msmCount+mmsCount) +(smsMNo != (mmsCount + msmCount)));
-				// 数量只要有一个变化就发送
-				if (phoneNo != phoneCount || smsMNo != (mmsCount + msmCount)) {
-					Log.e("BaseApp", "_______________________________________________________________________________________读取短信和电话数量 ： 有变化");
-//					if (mmsCount == 0 && msmCount == 0 && phoneCount == 0) {
-//						doWriteUnReadPhoneAndSmsToWatch(0, 0);
-//						return;
-//					} else {
-						doWriteUnReadPhoneAndSmsToWatch(phoneCount, (mmsCount+msmCount));
-//					}
-						
-						
-				}else{
-					Log.e("BaseApp", "__读取短信和电话数量 ： 无变化");
-				}
-				mHander.sendEmptyMessage(0xa1);
-			}
-		};
-		closeDisconnectRemind();
-		mHander.removeCallbacks(remindCloseRunnable);
+
+		// closeDisconnectRemind();
+		// mHander.removeCallbacks(remindCloseRunnable);
 		mHander.postDelayed((new Runnable() {
 			@Override
 			public void run() {
@@ -581,9 +681,9 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 				}
 			}
 		}, 15 * 1000);
-		
-		mHander.removeCallbacks(taskIncoming);
-		mHander.postDelayed(taskIncoming, 15*1000);
+
+//		mHander.removeCallbacks(taskIncoming);
+
 	}
 
 	@Override
@@ -607,26 +707,29 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 			writeCharacteristic(byteForSyncHistoryData);
 		}
 	}
-	
+
 	@Override
 	public void onDisconnected() {
-		phoneNo=-1;
-		smsMNo=-1;
+		phoneNo = -1;
+		smsMNo = -1;
+		
+		hrList.clear();
+		isStart = false;
 	}
 
-	/**
-	 * 关闭 断连提醒
-	 */
-	private void closeDisconnectRemind(){
-		if (musicService!=null&&musicService.isPlaying()) {
-			musicService.stop();
-			musicService.release();
-		}
-		if (null != disconnectDiloag && disconnectDiloag.isShowing()) {
-			disconnectDiloag.dismiss();
-		}
-	}
-	
+	// /**
+	// * 关闭 断连提醒
+	// */
+	// private void closeDisconnectRemind(){
+	// if (musicService!=null&&musicService.isPlaying()) {
+	// musicService.stop();
+	// musicService.release();
+	// }
+	// if (null != disconnectDiloag && disconnectDiloag.isShowing()) {
+	// disconnectDiloag.dismiss();
+	// }
+	// }
+
 	private void showdialog(String msg) {
 		if (disconnectDiloag != null) {
 			disconnectDiloag.dismiss();
@@ -635,11 +738,11 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 			@Override
 			public void onClick(View arg0) {
 				try {
-//					if (player != null) {
-//						player.stop();
-//						player.release();
-//						player = null;
-//					}
+					// if (player != null) {
+					// player.stop();
+					// player.release();
+					// player = null;
+					// }
 					if (musicService != null) {
 						musicService.stop();
 					}
@@ -659,10 +762,17 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 		intent.putExtra(EXTRA_CAMERA, notifyForCamera);
 		sendBroadcast(intent);
 	}
-
+	
+	public final static  String EXTRA_HEART_RATE_MAX = "EXTRA_HEART_RATE_MAX";
+	public final static String  EXTRA_HEART_RATE_MIN = "EXTRA_HEART_RATE_MIN";
+	public final static String  EXTRA_HEART_RATE_AVG = "EXTRA_HEART_RATE_AVG";
+	
 	private void bleDataForHeartRate(int hr) {
 		Intent intent = new Intent(ACTION_DATA_HEART_RATE);
 		intent.putExtra(EXTRA_HEART_RATE, hr);
+//		intent.putExtra(EXTRA_HEART_RATE_MAX, max);
+//		intent.putExtra(EXTRA_HEART_RATE_MIN, min);
+//		intent.putExtra(EXTRA_HEART_RATE_AVG, avg);
 		sendBroadcast(intent);
 	}
 
@@ -795,8 +905,6 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 		return player;
 	}
 
-	
-	
 	private void doUpdateSetting() {
 		if (dialogSyncSetting == null) {
 			dialogSyncSetting = new ProgressDialog(getApplicationContext());
@@ -814,99 +922,111 @@ public class SimpleBlueService extends AbstractSimpleBlueService {
 			if (bytes != null) {
 				writeValueToDevice(bytes);
 			}
-			
-//			// 第一次进入App 同步数据
-//			// 1。同步时间
-//			byte[] byteForSyncTime = ProtocolForWrite.instance().getByteForSyncTime(new Date());
-//			// 2。同步睡眠开始 结束时间
-//			int start = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_SLEEP_START_HOUR, 0);
-//			int end = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_SLEEP_END_HOUR, 0);
-//			byte[] byteForSleepTime = ProtocolForWrite.instance().getByteForSleepTime(start, end);
-//			// 3。最大最小心率
-//			int maxHr = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_HEART_RATE_MAX, 240);
-//			int minHr = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_HEART_RATE_MIN, 40);
-//			byte[] byteForHeartRate = ProtocolForWrite.instance().getByteForHeartRate(maxHr, minHr);
-//			// 4。闹钟时间
-//			// 获取初始值
-//			int hour_1 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_1, 12);
-//			int min_1 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_1, 00);
-//			int hour_2 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_2, 12);
-//			int min_2 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_2, 00);
-//			int hour_3 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_3, 12);
-//			int min_3 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_3, 00);
-//			int hour_4 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_4, 12);
-//			int min_4 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_4, 00);
-//			int hour_5 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_5, 12);
-//			int min_5 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_5, 00);
-//			boolean isChecked_1 = (boolean) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_CHECK_BOX_CLOCK_1, false);
-//			boolean isChecked_2 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_2, false);
-//			boolean isChecked_3 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_3, false);
-//			boolean isChecked_4 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_4, false);
-//			boolean isChecked_5 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_5, false);
-//			byte[] byteForAlarmClock = ProtocolForWrite.instance().getByteForAlarmClock(new int[] { hour_1, min_1, hour_2, min_2, hour_3, min_3, hour_4, min_4, hour_5, min_5 },
-//					new boolean[] { isChecked_1, isChecked_2, isChecked_3, isChecked_4, isChecked_5 });
-//			// 5。请求今天的睡眠数据
-//			byte[] byteForSleepQualityOfToday = ProtocolForWrite.instance().getByteForSleepQualityOfToday(0);
-//
-//			// byte[] byteForWeather = null;
-//			// //7.同步天气 ？
-//			// String wieid = (String)
-//			// SharedPreferenceUtil.get(getApplicationContext(),
-//			// Constant.SHARE_PLACE_WOEID, "");
-//			// // if (wieid != null) {
-//			// // String weather= (String)
-//			// SharedPreferenceUtil.get(getApplicationContext(),
-//			// Constant.SHARE_PLACE_WEATHER, "");
-//			// // String unit= (String)
-//			// SharedPreferenceUtil.get(getApplicationContext(),
-//			// Constant.SHARE_PLACE_UNIT, "");
-//			// // String temp = (String)
-//			// SharedPreferenceUtil.get(getApplicationContext(),
-//			// Constant.SHARE_PLACE_TEMP, "");
-//			// // byteForWeather =
-//			// ProtocolForWrite.instance().getByteForWeather(weather,
-//			// unit,temp);
-//			// // }
-//
-//			List<byte[]> values = new ArrayList<>();
-//			values.add(byteForSyncTime);
-//			values.add(byteForSleepTime);
-//			values.add(byteForHeartRate);
-//			values.add(byteForAlarmClock);
-//			values.add(byteForSleepQualityOfToday);
-//			// if (byteForSyncHistoryData != null) {
-//			// values.add(byteForSyncHistoryData);
-//			// }
-//			// if (byteForWeather!=null) {
-//			// values.add(byteForWeather);
-//			// }
-//			writeValueToDevice(values);
+
+			// 第一次进入App 同步数据
+			// 1。同步时间
+			byte[] byteForSyncTime = ProtocolForWrite.instance().getByteForSyncTime(new Date());
+			// 2。同步睡眠开始 结束时间
+			int start = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_SLEEP_START_HOUR, 0);
+			int end = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_SLEEP_END_HOUR, 0);
+			byte[] byteForSleepTime = ProtocolForWrite.instance().getByteForSleepTime(start, end);
+			// 3。最大最小心率
+			int maxHr = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_HEART_RATE_MAX, 240);
+			int minHr = (int) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_HEART_RATE_MIN, 40);
+			byte[] byteForHeartRate = ProtocolForWrite.instance().getByteForHeartRate(maxHr, minHr);
+			// 4。闹钟时间
+			// 获取初始值
+			int hour_1 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_1, 12);
+			int min_1 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_1, 00);
+			int hour_2 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_2, 12);
+			int min_2 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_2, 00);
+			int hour_3 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_3, 12);
+			int min_3 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_3, 00);
+			int hour_4 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_4, 12);
+			int min_4 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_4, 00);
+			int hour_5 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_HOUR_5, 12);
+			int min_5 = (int) SharedPreferenceUtil.get(this, Constant.SHARE_CLOCK_MIN_5, 00);
+			boolean isChecked_1 = (boolean) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_CHECK_BOX_CLOCK_1, false);
+			boolean isChecked_2 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_2, false);
+			boolean isChecked_3 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_3, false);
+			boolean isChecked_4 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_4, false);
+			boolean isChecked_5 = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_BOX_CLOCK_5, false);
+			byte[] byteForAlarmClock = ProtocolForWrite.instance().getByteForAlarmClock(new int[] { hour_1, min_1, hour_2, min_2, hour_3, min_3, hour_4, min_4, hour_5, min_5 },
+					new boolean[] { isChecked_1, isChecked_2, isChecked_3, isChecked_4, isChecked_5 });
+			// 5。请求今天的睡眠数据
+			byte[] byteForSleepQualityOfToday = ProtocolForWrite.instance().getByteForSleepQualityOfToday(0);
+
+			// byte[] byteForWeather = null;
+			// //7.同步天气 ？
+			// String wieid = (String)
+			// SharedPreferenceUtil.get(getApplicationContext(),
+			// Constant.SHARE_PLACE_WOEID, "");
+			// // if (wieid != null) {
+			// // String weather= (String)
+			// SharedPreferenceUtil.get(getApplicationContext(),
+			// Constant.SHARE_PLACE_WEATHER, "");
+			// // String unit= (String)
+			// SharedPreferenceUtil.get(getApplicationContext(),
+			// Constant.SHARE_PLACE_UNIT, "");
+			// // String temp = (String)
+			// SharedPreferenceUtil.get(getApplicationContext(),
+			// Constant.SHARE_PLACE_TEMP, "");
+			// // byteForWeather =
+			// ProtocolForWrite.instance().getByteForWeather(weather,
+			// unit,temp);
+			// // }
+
+			List<byte[]> values = new ArrayList<>();
+			values.add(byteForSyncTime);
+			values.add(byteForSleepTime);
+			values.add(byteForHeartRate);
+			values.add(byteForAlarmClock);
+			values.add(byteForSleepQualityOfToday);
+			// if (byteForSyncHistoryData != null) {
+			// values.add(byteForSyncHistoryData);
+			// }
+			// if (byteForWeather!=null) {
+			// values.add(byteForWeather);
+			// }
+			writeValueToDevice(values);
 		}
 	}
-	
 
 	/**
 	 * 未接来电和未读短信提醒
 	 */
 	private void doWriteUnReadPhoneAndSmsToWatch(int phone, int sms) {
-		Log.e("", "___________doWriteUnReadPhoneAndSmsToWatch" +sms);
-		
-		boolean isCallRemind;
-		isCallRemind = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_REMIND_CALL, false);
-		if (isCallRemind && getConnectState() == BluetoothProfile.STATE_CONNECTED && isBinded()) {
+		Log.e("", "___________doWriteUnReadPhoneAndSmsToWatch" + sms);
+
+	
+		if ( getConnectState() == BluetoothProfile.STATE_CONNECTED && isBinded()) {
 			Log.e("", "___________更新短信来电数量");
 			writeCharacteristic(ProtocolForWrite.instance().getByteForMissedCallAndMessage(phone, sms));
-			//只有当 改变了 ，才改变当前phoneNo 和smsNo
+			// 只有当 改变了 ，才改变当前phoneNo 和smsNo
 			smsMNo = sms;
 			Log.e("", "___________更新短信来电数量后的值 ：" + smsMNo);
 			phoneNo = phone;
-		
-		
+
 		}
 	}
-	
-	private int phoneNo=-1;
-	private int smsMNo=-1;
 
+	private String dataToString(List<Integer> listHr) {
+		StringBuffer sb = new StringBuffer();
+		
+		if (listHr.size() > 0) {
+			for (int i = 0; i < listHr.size(); i++) {
+				sb.append(String.valueOf(listHr.get(i)));
+				if (i != listHr.size() - 1) {
+					sb.append(",");
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+	private int phoneNo = -1;
+	private int smsMNo = -1;
+	private List<Integer> hrList = new ArrayList<>();;
+	private boolean isStart;
 
 }

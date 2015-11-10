@@ -1,5 +1,7 @@
 package com.mycj.mywatch.fragment;
 
+import org.litepal.crud.DataSupport;
+
 import com.mycj.mywatch.BaseFragment;
 import com.mycj.mywatch.R;
 import com.mycj.mywatch.activity.PedometerSettingAgeActivity;
@@ -9,6 +11,7 @@ import com.mycj.mywatch.activity.PedometerSettingWeightActivity;
 import com.mycj.mywatch.activity.SleepSettingEndTimeActivity;
 import com.mycj.mywatch.activity.SleepSettingStartTimeActivity;
 import com.mycj.mywatch.bean.Constant;
+import com.mycj.mywatch.bean.HeartRateData;
 import com.mycj.mywatch.business.ProtocolForWrite;
 import com.mycj.mywatch.service.AbstractSimpleBlueService;
 import com.mycj.mywatch.service.SimpleBlueService;
@@ -134,6 +137,7 @@ public class HeartRateSettingFragment extends BaseFragment implements OnClickLis
 	}
 
 
+	
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {

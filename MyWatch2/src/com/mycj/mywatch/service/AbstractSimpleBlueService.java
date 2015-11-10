@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import com.mycj.mywatch.MainActivity;
 import com.mycj.mywatch.R;
 import com.mycj.mywatch.bean.Constant;
+import com.mycj.mywatch.util.DataUtil;
 import com.mycj.mywatch.util.SharedPreferenceUtil;
 import com.mycj.mywatch.util.SoundPlay;
 import com.mycj.mywatch.view.AlertDialog;
@@ -62,6 +63,25 @@ public abstract class AbstractSimpleBlueService extends Service {
 	public void setBytes(List<byte[]> bytes){
 		this.bytes = bytes;
 	}
+	private void doDeviceFound(final BluetoothDevice device ,int rssi){
+		sendBroadcastForDeviceFound(device, rssi);
+		String bindedName = getBindedDeviceName();
+		String bindedAddress = getBindedDeviceAddress();
+		Log.v("", "bindedName ：" + bindedName);
+		Log.v("", "bindedAddress ：" + bindedAddress);
+		// && device.getName().equals(bindedName)
+		if (!isWrieteServiceFound) {
+			if (isBinded() && device.getAddress().equals(bindedAddress)) {
+				Log.e("AbstractSimpleBluetooth", "bindedName,bindedAddress = " + bindedName + "," + bindedAddress);
+				mHander.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						connect(device);
+					}
+				}, 500);
+			}
+		}
+	}
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -87,8 +107,11 @@ public abstract class AbstractSimpleBlueService extends Service {
 			// mSimpleBluetooth.stopScan();
 			// }
 			// }, 10 * 1000);
-			isScanning = true;
+			if (isScanning) {
+				mSimpleBluetooth.stopScan();
+			}
 			mSimpleBluetooth.startScan();
+			isScanning = true;
 		} else {
 			isScanning = false;
 			mSimpleBluetooth.stopScan();
@@ -138,7 +161,7 @@ public abstract class AbstractSimpleBlueService extends Service {
 			case 0xabc:
 				index++;
 				if (index<values.size()) {
-					mHander.postDelayed(runWrite, 3000);
+					mHander.postDelayed(runWrite, 1500);
 				}else{
 					index = 0;
 					mHander.removeCallbacks(runWrite);
@@ -148,9 +171,17 @@ public abstract class AbstractSimpleBlueService extends Service {
 				break;
 			case 0xa1:
 				//来电数量和短信数量
-				
 				mHander.removeCallbacks(taskIncoming);
 				mHander.postDelayed(taskIncoming, DIFF);
+				break;
+			case 0xf1:
+				BluetoothGatt gatt = (BluetoothGatt) msg.obj;
+				doDisconnected(gatt);
+				break;
+			case 0xf2:
+				BluetoothDevice device = (BluetoothDevice) msg.obj;
+				int rssi = msg.arg1;
+				doDeviceFound(device, rssi);
 				break;
 			default:
 				break;
@@ -243,7 +274,12 @@ public abstract class AbstractSimpleBlueService extends Service {
 	}
 
 	public boolean isEnable() {
-		return mSimpleBluetooth.isEnable();
+		if ( !mSimpleBluetooth.isEnable()) {
+			Log.e("", "----------adapter无效-------");
+			return false;
+		}else{
+			return true;
+		}
 	}
 
 	public boolean enable() {
@@ -282,6 +318,7 @@ public abstract class AbstractSimpleBlueService extends Service {
 		logE("service销毁！");
 		mSimpleBluetooth.close();
 		connectState = BluetoothProfile.STATE_DISCONNECTED;
+	
 		super.onDestroy();
 	}
 
@@ -312,22 +349,13 @@ public abstract class AbstractSimpleBlueService extends Service {
 
 		@Override
 		public void onLeScanCallBack(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-			sendBroadcastForDeviceFound(device, rssi);
-			String bindedName = getBindedName();
-			String bindedAddress = getBindedAddress();
-			Log.v("", "bindedName ：" + bindedName);
-			Log.v("", "bindedAddress ：" + bindedAddress);
-			// && device.getName().equals(bindedName)
-			if (isBinded() && device.getAddress().equals(bindedAddress)) {
-				Log.e("AbstractSimpleBluetooth", "bindedName,bindedAddress = " + bindedName + "," + bindedAddress);
-				mHander.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						connect(device);
-					}
-				}, 1000);
-
-			}
+			Message msg = mHander.obtainMessage();
+			msg.what=0xf2;
+			msg.arg1 = rssi;
+			msg.obj = device;
+			mHander.sendMessage(msg);
+			
+		
 		}
 
 		@Override
@@ -347,7 +375,6 @@ public abstract class AbstractSimpleBlueService extends Service {
 					gatt.writeDescriptor(descriptor);
 					saveDevice(gatt.getDevice());// 绑定蓝牙
 					isWrieteServiceFound = true;
-					
 					sendBroadcastForServiceDiscoveredWriteDevice(gatt, status);
 //					long currentTimeMillis = System.currentTimeMillis();
 					//如果本次链接服务 和上次链接服务的时间差大于5秒 就做通知
@@ -355,6 +382,7 @@ public abstract class AbstractSimpleBlueService extends Service {
 //						Log.i("","服务距离上次链接超过30秒，所以需要重新同步手机设置");
 //						lastDiscoveredServiceTime = currentTimeMillis;
 						onServicediscoveredSuccess();
+						scanDevice(false);
 //					}else{
 //						Log.i("","服务距离上次链接没有超过30秒，所以不需要重新同步手机设置");
 //					}
@@ -377,7 +405,7 @@ public abstract class AbstractSimpleBlueService extends Service {
 		}
 
 		@Override
-		public void onConnectionStateChangeCallBack(BluetoothGatt gatt, int status, int newState) {
+		public void onConnectionStateChangeCallBack(final BluetoothGatt gatt, int status, int newState) {
 			logE("-->  onConnectionStateChangeCallBack : [ newState : " + newState + "]");
 			sendBroadcastForConnectionState(gatt, newState);
 			connectState = newState;
@@ -389,62 +417,51 @@ public abstract class AbstractSimpleBlueService extends Service {
 				break;
 			case BluetoothProfile.STATE_DISCONNECTING:
 				logV("断开中");
-				connectState = newState;
 				break;
 			case BluetoothProfile.STATE_CONNECTING:
 				logV("连接中");
-				connectState = newState;
 				break;
 			case BluetoothProfile.STATE_DISCONNECTED:
-				onDisconnected();
-				logV("已断开");
-				// if (player!=null) {
-				// player.stop();
-				// player.release();
-				// }
-				connectState = newState;
-
-				// 首先，清空一些数据
-				isWrieteServiceFound = false; //
-				mBluetoothGattService = null;// 清空Service
-				characteristicWrite = null;// 清空 characteristic
+				Message msg = mHander.obtainMessage();
+				msg.what=0xf1;
+				msg.obj = gatt;
+				mHander.sendMessage(msg);
+			
 
 				// 掉线时， 当设备绑定，就尝试重连
-
-				if (mSimpleBluetooth.isBinded()) {
-
-					BluetoothGatt bluetoothGatt = mSimpleBluetooth.getBluetoothGatt();
-					if (bluetoothGatt != null) {
-						bluetoothGatt.connect();
-						// 5秒后再次检查是否连接并且找到服务成功，如果未成功则，关闭GATT。开启搜索
-
-						mHander.postDelayed(new Runnable() {
-							@Override
-							public void run() {
-								if (!isWrieteServiceFound) {
-									mSimpleBluetooth.close();// 清空Gatt
-									scanDevice(true); // 开始搜索
-									boolean isRemindOpen = (Boolean) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_CHECK_REMIND, false);
-									if (isRemindOpen) {
-										sendBroadcastForRemind();
-										onReconnectedOverTimeOut();
-									}
-								}
-							}
-						}, 5000);
-
-					}
-				}
+//
+//				if (mSimpleBluetooth.isBinded()) {
+//
+//					BluetoothGatt bluetoothGatt = mSimpleBluetooth.getBluetoothGatt();
+//					if (bluetoothGatt != null) {
+//						bluetoothGatt.connect();
+//						// 5秒后再次检查是否连接并且找到服务成功，如果未成功则，关闭GATT。开启搜索
+//
+//						mHander.postDelayed(new Runnable() {
+//							@Override
+//							public void run() {
+//								if (!isWrieteServiceFound) {
+//									mSimpleBluetooth.close();// 清空Gatt
+//									scanDevice(true); // 开始搜索
+////									boolean isRemindOpen = (Boolean) SharedPreferenceUtil.get(getApplicationContext(), Constant.SHARE_CHECK_REMIND, false);
+////									if (isRemindOpen) {
+////										sendBroadcastForRemind();
+////										onReconnectedOverTimeOut();
+////									}
+//								}
+//							}
+//						}, 2000);
+//					}
+//				}
 				break;
 			default:
 				break;
 			}
-
 		}
 
 		@Override
 		public void onCharacteristicWriteCallBack(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-
+			Log.e("Service", "-->	onCharacteristicWriteCallBack :	" + DataUtil.byteToHexString(characteristic.getValue()));
 		}
 
 		@Override
@@ -456,6 +473,32 @@ public abstract class AbstractSimpleBlueService extends Service {
 
 	public interface OnDisconnectListener{
 		public void onDisconnect();
+	}
+	
+	
+
+	
+	private void doDisconnected(BluetoothGatt gatt){
+		onDisconnected();
+		logV("已断开");
+		// if (player!=null) {
+		// player.stop();
+		// player.release();
+		// }
+
+		// 首先，清空一些数据
+		isWrieteServiceFound = false; //
+		mBluetoothGattService = null;// 清空Service
+		characteristicWrite = null;// 清空 characteristic
+		gatt.close();
+		gatt=null;
+		scanDevice(true);
+		mHander.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				scanDevice(true);
+			}
+		}, 2000);
 	}
 	
 	public void setOnDisconnectListener(OnDisconnectListener l){

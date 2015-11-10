@@ -42,6 +42,7 @@ public abstract class AbstractSimpleBluetooth implements IBluetooth {
 		if (mBluetoothAdapter != null) {
 			return mBluetoothAdapter.isEnabled();
 		} else {
+			Log.e("", "----------mBluetoothAdapter为空-------");
 			return false;
 		}
 	}
@@ -62,6 +63,8 @@ public abstract class AbstractSimpleBluetooth implements IBluetooth {
 	public void startScan() {
 		if (mBluetoothAdapter != null) {
 			mBluetoothAdapter.startLeScan(scanCallBack);
+		}else{
+			Log.e("", "mBluetoothAdapter失效" );
 		}
 	}
 
@@ -113,7 +116,6 @@ public abstract class AbstractSimpleBluetooth implements IBluetooth {
 	@Override
 	public void close() {
 		if (mBluetoothGatt!=null) {
-			mBluetoothGatt.disconnect();
 			mBluetoothGatt.close();
 			mBluetoothGatt=null;
 		}

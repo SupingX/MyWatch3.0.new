@@ -78,6 +78,7 @@ public class DateUtil {
     	c.add(Calendar.DATE, diff);
     	return  c.getTime();
     }
+    
     //当前的前DIFF月
     public static Date getDateOfDiffMonth(Date date,int diff){
     	Calendar c = Calendar.getInstance();

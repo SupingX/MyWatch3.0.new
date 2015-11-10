@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+                                <string name="hours_short">时</string>        
+    <string name="min_short">分</string>
     <string name="clock">闹钟</string>
     <string name="save">保存</string>
     <string name="data_manager">数据管理</string>
@@ -183,6 +184,13 @@
         <string name="find_phone">查找手机</string>
         
         <string name="stop_searching">停止搜索中...</string>
+        <string name="hr_history_time">时间</string>
+        <string name="positive_to_delete">确定删除记录？</string>
         
+         <string name="index">序号</string>
+         <string name="exit_app">退出程序？</string>
+            <string name="lanuage">zh</string>
+               <string name="user_manual">使用说明书</string>
+            <string name="share">分享</string>
      
 </resources>

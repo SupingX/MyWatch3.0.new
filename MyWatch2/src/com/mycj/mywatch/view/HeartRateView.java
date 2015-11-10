@@ -31,6 +31,7 @@ public class HeartRateView extends View {
 
 	private String[] textY = new String[] { "40", "80", "120", "160", "200", "240" };
 	private LinkedList<Float> data = new LinkedList<>();
+	
 	private float perX;
 	private float perY;
 	private Paint mPaintPath;

@@ -3,15 +3,14 @@
 
     <item android:state_selected="true"><shape>
             <!-- 填充 -->
-            <solid android:color="@color/color_top_blue_lighter" />
+            <solid android:color="#F0F0F0" />
         </shape></item>
     <item android:state_checked="true"><shape>
             <!-- 填充 -->
-            <solid android:color="@color/color_top_blue_lighter" />
+            <solid android:color="#F0F0F0" />
         </shape></item>
     <item android:state_pressed="true"><shape>
             <!-- 填充 -->
-            <solid android:color="@color/color_top_blue_lighter" />
+            <solid android:color="#F0F0F0" />
         </shape></item>
-
 </selector>

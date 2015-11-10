@@ -90,7 +90,6 @@ public class PedoFragment extends BaseFragment{
 	public void onStart() {
 		super.onStart();
 		mSimpleBlueService = getSimpleBlueService();
-		
 		getActivity().registerReceiver(mReceiver, SimpleBlueService.getIntentFilter());
 		completeStep = getActivity().getIntent().getIntExtra("step", 0); 
 //		int cal = getActivity().getIntent().getIntExtra("cal", 0); 

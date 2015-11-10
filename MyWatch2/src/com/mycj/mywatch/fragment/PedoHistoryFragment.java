@@ -208,7 +208,8 @@ public class PedoHistoryFragment extends BaseFragment implements OnClickListener
 	
 		// 从数据库中获取一个月所有的天数的数据
 		// List<SleepData> list = findAllSleepDateByMonth(date);
-
+		
+		Log.e("", "data数据 List<Float>----------------------------->" + data.toString());
 		return data;
 	}
 
@@ -220,9 +221,11 @@ public class PedoHistoryFragment extends BaseFragment implements OnClickListener
 	 */
 	private PedoData findStepDateByDate(Date date) {
 		String sql = DateUtil.dateToString(date, "yyyyMMdd");
-		Log.e("", "______________________________查询的日期 ：sql" + sql);
 		List<PedoData> stepdatas = DataSupport.where("year=? and month=? and day=?", sql.substring(0,4),sql.substring(4,6),sql.substring(6,8)).find(PedoData.class);
+		Log.e("", "______________________________查询的日期 ：sql" + sql +"数据："+stepdatas);
 		if (stepdatas != null && stepdatas.size() > 0) {
+			int step = stepdatas.get(0).getStep();
+			Log.e("", "step:"+step);
 			return stepdatas.get(0);
 		} else {
 			return null;

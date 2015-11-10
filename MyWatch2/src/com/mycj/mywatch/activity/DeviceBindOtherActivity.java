@@ -16,6 +16,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -100,8 +101,11 @@ public class DeviceBindOtherActivity extends BaseActivity implements OnClickList
 				
 				@Override
 				public void run() {
-					mSimpleBlueService.close();
-					mSimpleBlueService.scanDevice(true);
+					if (mSimpleBlueService!=null) {
+						mSimpleBlueService.close();
+						mSimpleBlueService.scanDevice(true);
+					}
+					
 				}
 			});
 			
@@ -121,6 +125,22 @@ public class DeviceBindOtherActivity extends BaseActivity implements OnClickList
 
 	}
 
+	
+//	private void startScan(){
+//		if (mSimpleBlueService!=null && mSimpleBlueService.isEnable()) {
+//			mSimpleBlueService.scanDevice(true);
+//			mHandler.postDelayed(new Runnable() {
+//				
+//				@Override
+//				public void run() {
+//					if (mSimpleBlueService!=null && mSimpleBlueService.isEnable()) {
+//					mSimpleBlueService.scanDevice(false);
+//					mSimpleBlueService.scanDevice(true);
+//					}
+//				}
+//			}, 2000);
+//		}
+//	}
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -128,13 +148,22 @@ public class DeviceBindOtherActivity extends BaseActivity implements OnClickList
 		mSimpleBlueService = getSimpleBlueService();
 		Log.e("", "mSimpleBlueService : " + mSimpleBlueService);
 		registerReceiver(mReceiver, SimpleBlueService.getIntentFilter());
+		
+		if (mSimpleBlueService!=null && mSimpleBlueService.isEnable()) {
+			mSimpleBlueService.scanDevice(true);
+		}
 	}
 
 	@Override
 	protected void onResume() {
+//		startScan();
+		startScan(mSimpleBlueService, mHandler);
+//		if (mSimpleBlueService!=null && mSimpleBlueService.isEnable()) {
+//			mSimpleBlueService.scanDevice(true);
+//		}
 		startAnimation.start();
 		super.onResume();
-		checkBlue();
+//		checkBlue();
 	}
 
 	@Override
@@ -166,11 +195,13 @@ public class DeviceBindOtherActivity extends BaseActivity implements OnClickList
 				mHandler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						if (mSimpleBlueService.isEnable()) {
-							// 蓝牙打开
-							mSimpleBlueService.scanDevice(true);
-						} else {
-							// 未打开
+						if (mSimpleBlueService!=null) {
+							if (mSimpleBlueService.isEnable()) {
+								// 蓝牙打开
+								mSimpleBlueService.scanDevice(true);
+							} else {
+								// 未打开
+							}
 						}
 					}
 				}, 5000);

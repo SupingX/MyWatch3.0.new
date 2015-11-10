@@ -148,7 +148,7 @@ public class PedometerActivity extends BaseActivity implements OnClickListener {
 			tvTitle.setText(R.string.history);
 			tvHistory.setTextColor(getResources().getColor(R.color.color_top_blue));
 			setDrawable(tvHistory, R.drawable.ic_pedo_tab_history);
-			imgShare.setVisibility(View.GONE);
+			imgShare.setVisibility(View.VISIBLE);
 			break;
 		case 2:
 			pedoViewPager.setCurrentItem(2);

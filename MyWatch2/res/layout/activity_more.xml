@@ -26,7 +26,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_alignParentLeft="true"
-            android:background="@drawable/selector_home_bg"
+            android:background="@drawable/selector_back_bg"
             android:clickable="true" >
 
             <ImageView
@@ -322,7 +322,7 @@
         android:layout_marginTop="24dp"
         android:background="@color/alertdialog_line" />
        <RelativeLayout
-        android:id="@+id/rl_about"
+        android:id="@+id/rl_help"
         style="@style/DeviceItem"
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -343,10 +343,56 @@
             android:src="@drawable/ic_more_about" />
 
         <TextView
-            android:id="@+id/tv_about"
+            android:id="@+id/tv_help"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_toRightOf="@id/img_about"
+            android:gravity="center_vertical"
+            android:text="@string/user_manual"
+            android:textColor="@color/black_device"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:gravity="center"
+            android:src="@drawable/ic_action_next_item" />
+    </RelativeLayout>
+          <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1px"
+        android:layout_marginLeft="48dp"
+        android:background="@color/alertdialog_line" />
+    <RelativeLayout
+        android:id="@+id/rl_about"
+        style="@style/DeviceItem"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:clickable="true"
+    android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" >
+
+        <ImageView
+            android:id="@+id/img_about_"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="12dp"
+            android:gravity="center"
+            android:src="@drawable/more_information" />
+
+        <TextView
+            android:id="@+id/tv_about"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/img_about_"
             android:gravity="center_vertical"
             android:text="@string/about"
             android:textColor="@color/black_device"
@@ -361,6 +407,15 @@
             android:clickable="true"
             android:gravity="center"
             android:src="@drawable/ic_action_next_item" />
+
+           <ImageView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_centerVertical="true"
+               android:layout_marginRight="12dp"
+                            android:visibility="invisible"
+              />
+
     </RelativeLayout>
     <View
         android:layout_width="match_parent"

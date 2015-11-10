@@ -2,15 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mycj.mywatch"
     android:versionCode="1"
-    android:versionName="1.0.1510211343" >
+    android:versionName="1.0.4" >
 
     <uses-sdk
         android:minSdkVersion="18"
         android:targetSdkVersion="22" />
-    
-       
+
     <!-- 时候前台显示 -->
-	<uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
     <!-- 相机 -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
@@ -34,7 +33,6 @@
     <!-- 全局弹窗 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" >
     </uses-permission>
-   
 
     <uses-feature
         android:name="android.hardware.bluetooth_le"
@@ -185,13 +183,13 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.mycj.mywatch.activity.SleepSettingStartTimeActivity"
+            android:name=".activity.SleepSettingStartTimeActivity"
             android:label="@string/title_activity_sleep_setting_start_time"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.mycj.mywatch.activity.SleepSettingEndTimeActivity"
+            android:name=".activity.SleepSettingEndTimeActivity"
             android:label="@string/title_activity_sleep_setting_end_time"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" >
@@ -204,28 +202,33 @@
             android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
-            android:name="com.mycj.mywatch.activity.WeatherCitySetActivity"
+            android:name=".activity.WeatherCitySetActivity"
             android:label="@string/title_activity_weather_city_set"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.mycj.mywatch.activity.WeatherTempUnitSetActivity"
+            android:name=".activity.WeatherTempUnitSetActivity"
             android:label="@string/title_activity_weather_temp_unit_set"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" >
         </activity>
 
         <!-- Receiver -->
-   <!--     <receiver android:name=".BluetoothStateBroadcastReceiver" >
+        <!--
+            <receiver android:name=".BluetoothStateBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
                 <action android:name="android.bluetooth.adapter.action.ACTION_CONNECTION_STATE_CHANGED" />
                 <action android:name="android.bluetooth.adapter.action.ACTION_ACL_DISCONNECTED" />
                 <action android:name="android.bluetooth.adapter.action.ACTION_ACL_CONNECTED" />
             </intent-filter>
-        </receiver>  -->
-        
+        </receiver>
+        -->
+        <activity
+            android:name=".AppInfoActivity"
+            android:label="@string/title_activity_app_info" >
+        </activity>
     </application>
 
 </manifest>

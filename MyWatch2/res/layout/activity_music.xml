@@ -20,9 +20,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="@drawable/selector_music_bg"
               android:src="@drawable/ic_music_preious" />
 
         <ImageView
+                        android:background="@drawable/selector_music_bg"
                       android:padding="4dp"
              android:id="@+id/img_music_start_or_stop"
             android:layout_width="match_parent"
@@ -33,6 +35,7 @@
 
 
         <ImageView
+                        android:background="@drawable/selector_music_bg"
                       android:padding="4dp"
        android:id="@+id/img_music_next"
             android:layout_width="match_parent"
@@ -73,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
-                android:background="@drawable/selector_home_bg"
+                android:background="@drawable/selector_back_bg"
                 android:clickable="true" >
 
                 <ImageView

@@ -1,5 +1,6 @@
 package com.mycj.mywatch.activity;
 
+import com.mycj.mywatch.AbstractBluetoothStateBroadcastReceiver;
 import com.mycj.mywatch.BaseActivity;
 import com.mycj.mywatch.R;
 import com.mycj.mywatch.bean.Constant;
@@ -13,10 +14,13 @@ import com.mycj.mywatch.view.ActionSheetDialog.OnSheetItemClickListener;
 import com.mycj.mywatch.view.ActionSheetDialog.SheetItemColor;
 
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -27,6 +31,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DeviceActivity extends BaseActivity implements OnClickListener {
 
@@ -39,7 +44,48 @@ public class DeviceActivity extends BaseActivity implements OnClickListener {
 	private ImageView imgDeviceExit;
 	private CheckBox cbRemind;
 	private AbstractSimpleBlueService mSimpleBlueService;
+	private AbstractBluetoothStateBroadcastReceiver mBlueStateReceiver = new AbstractBluetoothStateBroadcastReceiver(){
 
+		@Override
+		public void onBluetoothChange(int state, int previousState) {
+			switch (state) {
+			case BluetoothAdapter.STATE_ON:
+				Log.i("", "蓝牙已打开");
+				if (openBlueDialog!=null && openBlueDialog.isShowing()) {
+					openBlueDialog.dismiss();
+					openBlueDialog=null;
+				}
+				startActivity(DeviceBindOtherActivity.class);
+				
+				break;
+			case BluetoothAdapter.STATE_TURNING_OFF:
+				Log.i("", "蓝牙关闭中。。。");
+				break;
+			case BluetoothAdapter.STATE_TURNING_ON:
+				Log.i("", "蓝牙打开中。。。");
+				break;
+			case BluetoothAdapter.STATE_OFF:
+				Log.i("", "蓝牙已关闭");
+//				if (openBlueDialog!=null && openBlueDialog.isShowing()) {
+//					openBlueDialog.dismiss();
+//				}
+				break;
+			default:
+				break;
+			}
+		}
+	};
+	
+	/**
+	 * 监听蓝牙变化情况
+	 */
+	private void registerBoradcastReceiverForCheckBlueToothState(BroadcastReceiver stateChangeReceiver) {
+		IntentFilter stateChangeFilter = new IntentFilter();
+		stateChangeFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+		stateChangeFilter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+		registerReceiver(stateChangeReceiver, stateChangeFilter);
+	}
+	
 	private boolean isRemindOpen;
 
 	private Handler mHandler = new Handler() {
@@ -68,6 +114,7 @@ public class DeviceActivity extends BaseActivity implements OnClickListener {
 			}
 		}
 	};
+	private ProgressDialog openBlueDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,13 +131,16 @@ public class DeviceActivity extends BaseActivity implements OnClickListener {
 		mSimpleBlueService = getSimpleBlueService();
 		Log.e("", "mSimpleBlueService : " + mSimpleBlueService);
 		registerReceiver(mReceiver, SimpleBlueService.getIntentFilter());
+		registerBoradcastReceiverForCheckBlueToothState(mBlueStateReceiver);
 	}
 
 	@Override
 	protected void onResume() {
 		isRemindOpen = (boolean) SharedPreferenceUtil.get(this, Constant.SHARE_CHECK_REMIND, false);//
 		setCurrentDevice();
-		setDeviceConnectState(mSimpleBlueService.getConnectState());
+		if (mSimpleBlueService!=null) {
+			setDeviceConnectState(mSimpleBlueService.getConnectState());
+		}
 		setCheckBoxRemind();
 		super.onResume();
 	}
@@ -99,6 +149,7 @@ public class DeviceActivity extends BaseActivity implements OnClickListener {
 	protected void onStop() {
 		super.onStop();
 		unregisterReceiver(mReceiver);
+		unregisterReceiver(mBlueStateReceiver);
 
 	}
 
@@ -115,7 +166,6 @@ public class DeviceActivity extends BaseActivity implements OnClickListener {
 		rlBindOther = (RelativeLayout) findViewById(R.id.rl_bind_other);
 		cbRemind = (CheckBox) findViewById(R.id.cb_remind);
 		imgDeviceExit = (ImageView) findViewById(R.id.img_current_device_exit);
-
 		tvDeviceName = (TextView) findViewById(R.id.tv_current_device_name);
 		tvDeviceAddress = (TextView) findViewById(R.id.tv_current_device_address);
 		tvDeviceConnectState = (TextView) findViewById(R.id.tv_current_device_connect_state);
@@ -141,7 +191,14 @@ public class DeviceActivity extends BaseActivity implements OnClickListener {
 			startActivity(DeviceSearchDeviceActivity.class);
 			break;
 		case R.id.rl_bind_other:
-			startActivity(DeviceBindOtherActivity.class);
+			if (mSimpleBlueService!=null && !mSimpleBlueService.isEnable()) {
+				//检查是否打开蓝牙
+				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableBtIntent, 1);
+			
+			}else{
+				startActivity(DeviceBindOtherActivity.class);
+			}
 			break;
 		case R.id.cb_remind:
 			isRemindOpen = !isRemindOpen;
@@ -218,6 +275,29 @@ public class DeviceActivity extends BaseActivity implements OnClickListener {
 		}
 
 	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent arg2) {
+		if (requestCode==1) {
+			if (resultCode == RESULT_OK) {
+				openBlueDialog = showProgressDialog("正在打开蓝牙...",false);
+				mHandler.postDelayed(new Runnable() {
+					
+					@Override
+					public void run() {
+						if (openBlueDialog!=null &&openBlueDialog.isShowing()) {
+							openBlueDialog.dismiss();
+							openBlueDialog=null;
+						}
+					}
+				}, 5000);
+			}
+		}
+		super.onActivityResult(requestCode, resultCode, arg2);
+	}
+	
+
+	
 
 	/**
 	 * 设置是否打开提醒

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_name">MyWatch</string>
+    <string name="title_activity_app_info">AppInfoActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_pedometer">PedometerActivity</string>
     <string name="title_activity_heart_rate">HeartRateActivity</string>
@@ -11,15 +10,9 @@
     <string name="title_activity_device">DeviceActivity</string>
     <string name="title_activity_weather">WeatherActivity</string>
     <string name="title_activity_more">MoreActivity</string>
-    <string name="connected_watch">BOUND DEVICE</string>
-    <string name="device_none">BOUND DEVICE</string>
-<!--     <string name="other_watch">Disconnected</string> -->
     <string name="title_activity_test">TestActivity</string>
     <string name="title_activity_device_search_device">DeviceSearchDeviceActivity</string>
     <string name="title_activity_device_bind_other">DeviceBindOtherActivity</string>
-    <string name="contact_binding">Release bound?</string>
-    <string name="confirm">Confirm</string>
-    <string name="no_device_binding">No device binding</string>
     <string name="title_activity_music">MusicActivity</string>
     <string name="title_activity_data_manager">DataManagerActivity</string>
     <string name="title_activity_spalish">SpalishActivity</string>
@@ -30,14 +23,19 @@
     <string name="title_activity_pedometer_setting_age">PedometerSettingAgeActivity</string>
     <string name="title_activity_sleep_setting_start_time">SleepSettingStartTimeActivity</string>
     <string name="title_activity_sleep_setting_end_time">SleepSettingEndTimeActivity</string>
-    <string name="preious">"&lt;&lt; "</string>
-    <string name="next">" >>"</string>
     <string name="title_activity_dialog">DialogActivity</string>
     <string name="title_activity_weather_city_set">WeatherCitySetActivity</string>
     <string name="title_activity_weather_temp_unit_set">WeatherTempUnitSetActivity</string>
-    
-    
-    
+    <!-- 上面不用改 -->
+
+    <string name="no_device_binding">No device binding</string>
+    <string name="contact_binding">Release bound?</string>
+    <string name="confirm">Confirm</string>
+    <string name="preious">"&lt;&lt; "</string>
+    <string name="next">" >>"</string>
+    <string name="connected_watch">BOUND DEVICE</string>
+    <string name="device_none">BOUND DEVICE</string>
+    <string name="app_name">My Watch</string>
     <string name="clock">CLOCK</string>
     <string name="save">Save</string>
     <string name="data_manager">DATA MANAGER</string>
@@ -47,7 +45,6 @@
     <string name="device">DEVICE</string>
     <string name="connection">CONNECTION</string>
     <string name="available_device_nearby">AVAILABLE DEVICE NEARBY</string>
-
     <string name="disconnected">Disconnected</string>
     <string name="search_device">Search device</string>
     <string name="bind_other_device">Bind other device</string>
@@ -59,22 +56,19 @@
     <string name="sleep">SLEEP</string>
     <string name="steps">STEPS</string>
     <string name="hours">HOURS</string>
+    <string name="hours_short">:</string>
+    <string name="min_short"></string>
     <string name="bmp">BPM</string>
     <string name="rssi">RSSI</string>
     <string name="off">OFF</string>
     <string name="on">ON</string>
-    
     <string name="weather">WEATHER</string>
     <string name="camera">CAMERA</string>
-    
     <string name="call_reminder">Call Reminder</string>
     <string name="music">Music</string>
     <string name="watch_time_sync">Watch Time Sync</string>
     <string name="shutdown_watch">Shutdown Watch</string>
     <string name="about">About</string>
-    
-    
-    
     <string name="age">AGE</string>
     <string name="_0_200">Set range 0~200</string>
     <string name="height">HEIGHT</string>
@@ -87,58 +81,44 @@
     <string name="city">CITY</string>
     <string name="_write_city_name">Enter the city name</string>
     <string name="available_city_0">AVAILABLE CITY :</string>
-        <string name="search">SEARCH</string>
-        
-        
-        <string name="temperature">TEMPERATURE</string>
-        <string name="select_type">SELECT TYPE</string>
-        
-        <string name="_setting_city">Set city</string>
-        <string name="update_date">UPDATE DATE</string>
-        
-        <string name="_max_hr">Maximum HR</string>
-        <string name="_min_hr">Minimum HR</string>
-        <string name="_240">Maximum 240</string>
-        <string name="_40">Minimum 40</string>
-        <string name="current_hr">Current HR</string>
-        <string name="avg_hr"> Average HR</string>
-        
-        
-        <string name="step_total">STEP TOTAL</string>
-        <string name="total_distance">TOTAL DISTANCE</string>
-        <string name="total_calorie">TOTAL CALORIE</string>
-        
-        <string name="complete">complete</string>
-        <string name="calorie">CALORIE</string>
-        <string name="distance">DISTANCE</string>
-        <string name="time">TIME</string>
-        <string name="gender">Gender</string>
-        <string name="sleep_total">SLEEP TOTAL</string>
-        <string name="sleep_avg">SLEEP AVG</string>
-        
-        <string name="awake_time">AWAKE TIME</string>
-        <string name="deep_sleep">DEEP SLEEP</string>
-        <string name="light_sleep">LIGHT SLEEP</string>
-        <string name="cancel">Cancel</string>
-        
-        
-        <string name="min">Min</string>
-        <string name="device_is_not_connected">No connection to the ring</string>
-        
-        
-        <string name="is_deleteing">Is deleting</string>
-        
-        
-        <string name="is_setting">In settings</string>
-        <string name="no_binding">No binding</string>
-        <string name="is_connected">Binding</string>
-        <string name="is_connecting">Matching</string>
-        <string name="binded">Binded</string>
-        <string name="connect_closing">Connect down</string>
-        <string name="enable_blue">Turn on Bluetooth?</string>
-        <string name="open">Open</string>
-        
-        <!-- 天气 -->
+    <string name="search">SEARCH</string>
+    <string name="temperature">TEMPERATURE</string>
+    <string name="select_type">SELECT TYPE</string>
+    <string name="_setting_city">Set city</string>
+    <string name="update_date">UPDATE DATE</string>
+    <string name="_max_hr">Max HR</string>
+    <string name="_min_hr">Min HR</string>
+    <string name="_240">Max 240</string>
+    <string name="_40">Min 40</string>
+    <string name="current_hr">Current HR</string>
+    <string name="avg_hr"> Average</string>
+    <string name="step_total">STEP TOTAL</string>
+    <string name="total_distance">TOTAL DISTANCE</string>
+    <string name="total_calorie">TOTAL CALORIE</string>
+    <string name="complete">complete</string>
+    <string name="calorie">CALORIE</string>
+    <string name="distance">DISTANCE</string>
+    <string name="time">TIME</string>
+    <string name="gender">Gender</string>
+    <string name="sleep_total">SLEEP TOTAL</string>
+    <string name="sleep_avg">SLEEP AVG</string>
+    <string name="awake_time">AWAKE TIME</string>
+    <string name="deep_sleep">DEEP SLEEP</string>
+    <string name="light_sleep">LIGHT SLEEP</string>
+    <string name="cancel">Cancel</string>
+    <string name="min">Min</string>
+    <string name="device_is_not_connected">No connection to the ring</string>
+    <string name="is_deleteing">Is deleting</string>
+    <string name="is_setting">In settings</string>
+    <string name="no_binding">No binding</string>
+    <string name="is_connected">Binding</string>
+    <string name="is_connecting">Matching</string>
+    <string name="binded">Binded</string>
+    <string name="connect_closing">Connect down</string>
+    <string name="enable_blue">Turn on Bluetooth?</string>
+    <string name="open">Open</string>
+
+    <!-- 天气 -->
     <string name="weather_20">Tornado</string>
     <string name="weather_16">Tropical storm</string>
     <string name="weather_19">Hurricane</string>
@@ -174,31 +154,33 @@
     <string name="kcal">KCAL</string>
     <string name="km">KM</string>
     <string name="today">today,</string>
-    <string name="sync_all_ing">In sync</string>
+    <string name="sync_all_ing">Syncing</string>
     <string name="_cm">CM</string>
     <string name="kg">KG</string>
     <string name="female">Female</string>
     <string name="male">Male</string>
-    
-    
     <string name="in_searching">Ready to find</string>
     <string name="in_weathering">Loading weather</string>
     <string name="in_citying">Searching City</string>
     <string name="loading">Loading</string>
     <string name="choose_sex">Select gender</string>
-    
     <string name="setting_wrong">Set error</string>
-    <string name="in_conntecting">In connection</string>
+    <string name="in_conntecting">Connectioning</string>
     <string name="close_">Close ?</string>
     <string name="Exit">Shut down</string>
     <string name="app_version_info">App Version:</string>
     <string name="positive">Confirm</string>
     <string name="find_phone">Find the phone</string>
-     
-          <string name="stop_searching">Stop searching...</string>
-    
-        
-        
-    
+    <string name="stop_searching">Stop searching...</string>
+    <string name="hr_history_time">Time</string>
+    <string name="positive_to_delete">Determine delete records?</string>
+    <string name="index">No.</string>
+    <string name="exit_app">Quits App ?</string>
+
+    <string name="lanuage">en</string>
+
+    <string name="user_manual">User Manual</string>
+
+    <string name="share">Share</string>
 
 </resources>

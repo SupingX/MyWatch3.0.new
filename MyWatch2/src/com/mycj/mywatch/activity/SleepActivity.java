@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
@@ -123,6 +124,33 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 				return fragments.get(pos);
 			}
 		});
+		sleepViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+			
+			@Override
+			public void onPageSelected(int arg0) {
+				if (arg0==0) {
+					if (null!=mSimpleBlueService&&mSimpleBlueService.isBinded()&&mSimpleBlueService.getConnectState()==BluetoothProfile.STATE_CONNECTED) {
+						byte[] data = ProtocolForWrite.instance().getByteForSleepQualityOfToday(0);
+						mSimpleBlueService.writeCharacteristic(data);
+					}
+				}else if (arg0==1) {
+					
+				}
+				
+				
+			}
+			
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+				
+			}
+			
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 
 	@Override
@@ -211,7 +239,7 @@ public class SleepActivity extends BaseActivity implements OnClickListener {
 			sleepViewPager.setCurrentItem(1);
 			tvHistory.setTextColor(getResources().getColor(R.color.color_top_blue));
 			setDrawable(tvHistory, R.drawable.ic_pedo_tab_history);
-			imgShare.setVisibility(View.GONE);
+			imgShare.setVisibility(View.VISIBLE);
 			break;
 		case 2:
 			sleepViewPager.setCurrentItem(2);

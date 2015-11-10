@@ -7,11 +7,29 @@ public class HeartRateData extends DataSupport{
 	private String year;
 	private String month;
 	private String day;
+	private String hour;
+	private String min;
 	private int id;
 	private int hr;
 	private int avghr;
 	private int maxHr;
 	private int minHr;
+	/**
+	 * 每一次测试心率的记录集合（实际：每次3分钟）
+	 * 格式为用，隔开，例如
+	 * 80,12,151,123,13,2,131122
+	 */
+	private String hrDatas;
+	
+	public HeartRateData(String year, String month, String day,String hour,String min,String hrDatas) {
+		super();
+		this.year = year;
+		this.month = month;
+		this.day = day;
+		this.hour = hour ;
+		this.min = min;
+		this.hrDatas = hrDatas;
+	}
 	public HeartRateData(String year,String month,String day,int hr, int avghr, int maxHr, int minHr) {
 		super();
 		this.year = year;
@@ -81,10 +99,9 @@ public class HeartRateData extends DataSupport{
 	
 	@Override
 	public String toString() {
-		return "[ hr : "+ this.hr 
-				+ ", avghr : " + this.avghr
-				+ ", minHr : " + this.minHr
-				+ ", maxHr : " + this.maxHr
+		return "["
+				+ "日期 : " + this.year+"-"+this.month+"-"+this.day+" "+this.hour+":"+this.min
+				+ "数据: " + this.hrDatas
 				+ " ]";
 	}
 	public String getYear() {
@@ -105,5 +122,25 @@ public class HeartRateData extends DataSupport{
 	public void setDay(String day) {
 		this.day = day;
 	}
+	public String getHrDatas() {
+		return hrDatas;
+	}
+	public void setHrDatas(String hrDatas) {
+		this.hrDatas = hrDatas;
+	}
+	public String getHour() {
+		return hour;
+	}
+	public void setHour(String hour) {
+		this.hour = hour;
+	}
+	public String getMin() {
+		return min;
+	}
+	public void setMin(String min) {
+		this.min = min;
+	}
+	
+	
 	
 }

@@ -148,5 +148,16 @@
     
         <string name="find_phone">携帯電話での検索</string>
           <string name="stop_searching">停止捜索中</string>
-
+               <string name="hr_history_time">時間</string>
+           
+                            <string name="positive_to_delete">   記録を削除しますか？</string>
+                            
+                                 <string name="index">シリアルナンバー</string>
+                                        <string name="exit_app">プログラムを終瞭する？</string>
+                                        
+                                      <string name="hours_short">時</string>        
+    <string name="min_short">分</string>
+        <string name="lanuage">en</string>
+           <string name="user_manual">使用説明書</string>
+               <string name="share">分かち合う</string>
 </resources>

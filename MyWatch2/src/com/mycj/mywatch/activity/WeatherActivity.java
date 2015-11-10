@@ -177,7 +177,7 @@ public class WeatherActivity extends BaseActivity implements OnClickListener, On
 						}
 						
 						if (null!=mSimpleBlueService&&mSimpleBlueService.isBinded()&&mSimpleBlueService.getConnectState()==BluetoothProfile.STATE_CONNECTED) {
-							mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForWeather(codedB.getProtol(), unitInt, tempInt));
+							mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForWeather(codedB.getProtol(), unitInt, Math.abs(tempInt)));
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
@@ -221,7 +221,7 @@ public class WeatherActivity extends BaseActivity implements OnClickListener, On
 						}
 						
 						if (null!=mSimpleBlueService&&mSimpleBlueService.isBinded()&&mSimpleBlueService.getConnectState()==BluetoothProfile.STATE_CONNECTED) {
-							mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForWeather(codedB.getProtol(), unitInt, tempInt));
+							mSimpleBlueService.writeCharacteristic(ProtocolForWrite.instance().getByteForWeather(codedB.getProtol(), unitInt, Math.abs(tempInt)));
 						}
 					} catch (JSONException e) {
 						e.printStackTrace();
